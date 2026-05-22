@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>গরুর রেশন ক্যালকুলেটর |</title>
+<title>Beef Cattle Ration Calculator — NRC 2021</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -494,9 +494,9 @@ td{padding:7px 10px;vertical-align:middle}
     <div class="live-bars-title">📊 রেশনের পুষ্টি পূরণের অবস্থা — Live Nutrition Status</div>
     <div class="grid2">
       <div>
-        <div class="pb-row"><div class="pb-label"><span>⚡ NEm পূরণ (রক্ষণাবেক্ষণ শক্তি)</span><span id="pb-nem-val">০%</span></div><div class="pb-wrap"><div class="pb" id="pb-nem" style="width:0%"></div></div></div>
-        <div class="pb-row"><div class="pb-label"><span>🚀 NEg পূরণ (বৃদ্ধি শক্তি)</span><span id="pb-neg-val">০%</span></div><div class="pb-wrap"><div class="pb" id="pb-neg" style="width:0%"></div></div></div>
-        <div class="pb-row"><div class="pb-label"><span>🥩 MP পূরণ (বিপাকযোগ্য প্রোটিন)</span><span id="pb-mp-val">০%</span></div><div class="pb-wrap"><div class="pb" id="pb-mp" style="width:0%"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>⚡ NEm ঘনত্ব (Mcal/kg DM)</span><span id="pb-nem-val">০%</span></div><div class="pb-wrap"><div class="pb" id="pb-nem" style="width:0%"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>🚀 NEg ঘনত্ব (Mcal/kg DM)</span><span id="pb-neg-val">০%</span></div><div class="pb-wrap"><div class="pb" id="pb-neg" style="width:0%"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>🥩 CP সরবরাহ (g/day)</span><span id="pb-mp-val">০%</span></div><div class="pb-wrap"><div class="pb" id="pb-mp" style="width:0%"></div></div></div>
       </div>
       <div>
         <div class="pb-row"><div class="pb-label"><span>🌾 DMI (দৈনিক শুষ্ক খাদ্য গ্রহণ)</span><span id="pb-dmi-val">০%</span></div><div class="pb-wrap"><div class="pb" id="pb-dmi" style="width:0%"></div></div></div>
@@ -754,89 +754,195 @@ let RATION = [];  // [{feedId, kg_dm, cost_tk}]
 //  FEED DATABASE (NRC Appendix + Bangladesh)
 // ════════════════════════════════════════
 const FEEDS = [
-  // id, name, bangla, cat, dm, tdn, nem, neg, cp, uip, ee, cf, ndf, adf, ca, p, notes
-  // ─── ROUGHAGES ───
-  {id:1,n:"Alfalfa – Hay, early bloom",b:"আলফালফা হেই (প্রথম ফুল)",c:"roughage",dm:90.5,tdn:60,nem:1.31,neg:0.74,cp:19.9,uip:22,ee:2.9,ndf:39.3,adf:31.9,ca:1.63,p:0.21,notes:"লেগিউম হেই; উচ্চ Ca"},
-  {id:2,n:"Alfalfa – Hay, mid-bloom",b:"আলফালফা হেই (মধ্য ফুল)",c:"roughage",dm:91.0,tdn:58,nem:1.24,neg:0.68,cp:18.7,uip:22,ee:2.6,ndf:47.1,adf:36.7,ca:1.19,p:0.24,notes:"মধ্য পর্যায়ের হেই"},
-  {id:3,n:"Alfalfa – Hay, full bloom",b:"আলফালফা হেই (পুর্ণ ফুল)",c:"roughage",dm:90.9,tdn:55,nem:1.14,neg:0.58,cp:17.0,uip:22,ee:3.4,ndf:48.8,adf:38.7,ca:1.01,p:0.27,notes:"পুর্ণ ফুলে মান কম"},
-  {id:4,n:"Alfalfa – Silage",b:"আলফালফা সাইলেজ",c:"roughage",dm:44.1,tdn:63,nem:1.39,neg:0.83,cp:19.5,uip:23,ee:3.7,ndf:47.5,adf:37.5,ca:1.5,p:0.35,notes:"ভেজা সাইলেজ"},
-  {id:5,n:"Barley – Silage",b:"বার্লি সাইলেজ",c:"roughage",dm:37.1,tdn:60,nem:1.31,neg:0.74,cp:11.9,uip:23,ee:2.92,ndf:56.8,adf:33.9,ca:0.42,p:0.29},
-  {id:6,n:"Barley – Straw",b:"বার্লি খড়",c:"roughage",dm:91.2,tdn:40,nem:0.60,neg:0.08,cp:4.4,uip:25,ee:1.9,ndf:72.5,adf:48.8,ca:0.29,p:0.07,notes:"নিম্নমানের আঁশ"},
-  {id:7,n:"Bermudagrass – Fresh",b:"বারমুডা ঘাস তাজা",c:"roughage",dm:30.3,tdn:64,nem:1.44,neg:0.86,cp:12.6,uip:20,ee:3.7,ndf:73.3,adf:36.8,ca:0.33,p:0.22},
-  {id:8,n:"Clover, Red – Hay",b:"লাল ক্লোভার হেই",c:"roughage",dm:89.1,tdn:60,nem:1.31,neg:0.74,cp:22.4,uip:22,ee:2.7,ndf:36.0,adf:32.0,ca:1.38,p:0.22,notes:"লেগিউম হেই"},
-  {id:9,n:"Corn – Silage, well-eared",b:"ভুট্টা সাইলেজ (মোচাসহ)",c:"roughage",dm:34.6,tdn:72,nem:1.69,neg:1.08,cp:8.65,uip:30,ee:3.09,ndf:46.0,adf:26.6,ca:0.29,p:0.21,notes:"উৎকৃষ্ট; উচ্চ শক্তি"},
-  {id:10,n:"Corn Cobs – Ground",b:"ভুট্টার মোচা গুঁড়া",c:"roughage",dm:90.1,tdn:50,nem:0.97,neg:0.42,cp:2.8,uip:50,ee:0.6,ndf:87.0,adf:39.5,ca:0.10,p:0.04,notes:"শুধু আঁশের উৎস"},
-  {id:11,n:"Cottonseed – Hulls",b:"তুলার বীজের খোসা",c:"roughage",dm:90.4,tdn:42,nem:0.68,neg:0.15,cp:4.2,uip:50,ee:1.7,ndf:88.3,adf:65.3,ca:0.15,p:0.10,notes:"অতি নিম্নমান; শুধু ভরাট"},
-  {id:12,n:"Fescue – Fresh",b:"ফেসকিউ ঘাস তাজা",c:"roughage",dm:31.3,tdn:61,nem:1.34,neg:0.77,cp:15.0,uip:20,ee:5.5,ndf:62.2,adf:34.4,ca:0.49,p:0.32},
-  {id:13,n:"Oats – Hay",b:"ওটস হেই",c:"roughage",dm:90.7,tdn:53,nem:1.08,neg:0.52,cp:9.5,uip:20,ee:2.4,ndf:63.0,adf:38.4,ca:0.29,p:0.22},
-  {id:14,n:"Oats – Silage",b:"ওটস সাইলেজ",c:"roughage",dm:36.4,tdn:59,nem:1.27,neg:0.70,cp:12.7,uip:23,ee:3.12,ndf:58.1,adf:38.6,ca:0.33,p:0.29},
-  {id:15,n:"Oats – Straw",b:"ওটস খড়",c:"roughage",dm:92.2,tdn:50,nem:0.97,neg:0.42,cp:4.4,uip:30,ee:2.2,ndf:74.4,adf:47.9,ca:0.23,p:0.09},
-  {id:16,n:"Orchardgrass – Fresh",b:"অর্চার্ড ঘাস তাজা",c:"roughage",dm:23.5,tdn:65,nem:1.57,neg:0.97,cp:12.5,uip:20,ee:3.7,ndf:58.1,adf:30.7,ca:0.44,p:0.37},
-  {id:17,n:"Sorghum – Fresh",b:"জোয়ার তাজা",c:"roughage",dm:26.7,tdn:66,nem:1.51,neg:0.91,cp:12.2,uip:20,ee:3.83,ndf:55.7,adf:29.0,ca:0.44,p:0.25,notes:"HCN সতর্কতা; পরিপক্কে নিরাপদ"},
-  {id:18,n:"Sorghum – Hay",b:"জোয়ার হেই",c:"roughage",dm:89.1,tdn:59,nem:1.28,neg:0.71,cp:10.8,uip:22,ee:2.8,ndf:61.4,adf:35.2,ca:0.37,p:0.27},
-  {id:19,n:"Wheat – Straw",b:"গমের খড়",c:"roughage",dm:91.5,tdn:42,nem:0.68,neg:0.15,cp:4.5,uip:20,ee:1.5,ndf:75.0,adf:49.0,ca:0.18,p:0.07,notes:"বাংলাদেশে সহজলভ্য"},
-  // ─── LOCAL BANGLADESH ───
-  {id:20,n:"Napier Grass – Fresh",b:"নেপিয়ার ঘাস (তাজা)",c:"local",dm:16.0,tdn:55,nem:1.10,neg:0.55,cp:10.5,uip:20,ee:2.8,ndf:65.0,adf:38.0,ca:0.42,p:0.28,notes:"বাংলাদেশে সর্বাধিক চাষযোগ্য; ৪৫–৬০ দিনে কাটুন"},
-  {id:21,n:"Napier Grass – Silage",b:"নেপিয়ার সাইলেজ",c:"local",dm:20.0,tdn:52,nem:1.05,neg:0.50,cp:9.0,uip:18,ee:2.5,ndf:67.0,adf:40.0,ca:0.40,p:0.25},
-  {id:22,n:"Para Grass – Fresh",b:"পারা ঘাস তাজা",c:"local",dm:18.0,tdn:53,nem:1.08,neg:0.52,cp:9.5,uip:18,ee:2.3,ndf:68.0,adf:40.0,ca:0.38,p:0.24},
-  {id:23,n:"Rice Straw",b:"ধানের খড়",c:"local",dm:91.0,tdn:36,nem:0.49,neg:0.00,cp:4.0,uip:20,ee:1.5,ndf:73.0,adf:50.0,ca:0.25,p:0.07,notes:"বাংলাদেশের প্রধান আঁশ; পুষ্টি কম"},
-  {id:24,n:"Sugarcane Top – Fresh",b:"আখের আগার পাতা",c:"local",dm:20.0,tdn:55,nem:1.10,neg:0.55,cp:10.0,uip:20,ee:2.2,ndf:65.0,adf:38.0,ca:0.45,p:0.22,notes:"আখ কাটার পর সহজলভ্য"},
-  {id:25,n:"Maize Stover – Dry",b:"ভুট্টার ডাঁটা-পাতা (শুকনো)",c:"local",dm:88.0,tdn:50,nem:0.97,neg:0.42,cp:6.0,uip:20,ee:1.8,ndf:68.0,adf:40.0,ca:0.30,p:0.18},
-  {id:26,n:"Jackfruit Leaves/Peel",b:"কাঁঠালের পাতা ও খোসা",c:"local",dm:25.0,tdn:52,nem:1.05,neg:0.50,cp:8.0,uip:15,ee:1.8,ndf:58.0,adf:38.0,ca:1.10,p:0.15},
-  {id:27,n:"Banana Pseudo-stem",b:"কলার কাণ্ড",c:"local",dm:7.0,tdn:50,nem:0.97,neg:0.42,cp:6.0,uip:15,ee:0.8,ndf:60.0,adf:42.0,ca:0.30,p:0.18,notes:"পানির পরিমাণ বেশি; তাজা খাওয়ানো যায়"},
-  // ─── GRAINS ───
-  {id:30,n:"Barley – Grain",b:"বার্লি শস্য",c:"grain",dm:88.1,tdn:88,nem:2.06,neg:1.40,cp:13.2,uip:27,ee:2.2,ndf:18.1,adf:5.77,ca:0.07,p:0.38,notes:"উচ্চ শক্তি; ভুট্টার বিকল্প"},
-  {id:31,n:"Corn – Grain, cracked/rolled",b:"ভুট্টা শস্য (ভাঙা)",c:"grain",dm:90.0,tdn:90,nem:2.24,neg:1.55,cp:9.8,uip:55,ee:4.06,ndf:10.8,adf:3.3,ca:0.03,p:0.32,notes:"বাংলাদেশে সহজলভ্য"},
-  {id:32,n:"Oats – Grain",b:"ওটস শস্য",c:"grain",dm:89.2,tdn:77,nem:1.85,neg:1.22,cp:13.6,uip:17,ee:5.2,ndf:29.3,adf:14.0,ca:0.10,p:0.34},
-  {id:33,n:"Sorghum – Grain",b:"জোয়ার শস্য",c:"grain",dm:89.2,tdn:77,nem:1.85,neg:1.22,cp:13.6,uip:17,ee:5.2,ndf:29.3,adf:14.0,ca:0.10,p:0.34},
-  {id:34,n:"Wheat – Grain",b:"গম শস্য",c:"grain",dm:87.5,tdn:88,nem:2.12,neg:1.46,cp:13.7,uip:20,ee:1.8,ndf:13.5,adf:4.1,ca:0.05,p:0.35,notes:"রুমেন অ্যাসিডোসিস সতর্কতা"},
-  {id:35,n:"Soybean – Whole, roasted",b:"সয়াবিন সম্পূর্ণ (ভাজা)",c:"grain",dm:86.4,tdn:94,nem:2.35,neg:1.64,cp:40.3,uip:25,ee:18.2,ndf:14.9,adf:11.1,ca:0.29,p:0.59,notes:"রোস্ট করে দিন; ইউরেজ নষ্ট করতে"},
-  // ─── PROTEIN SUPPLEMENTS ───
-  {id:40,n:"Blood Meal",b:"রক্তের গুঁড়া",c:"protein",dm:90.5,tdn:66,nem:1.51,neg:0.92,cp:93.8,uip:75,ee:1.69,ndf:41.6,adf:2.81,ca:0.29,p:0.70,notes:"সর্বোচ্চ UIP; রুমেনে অবিচ্ছিন্ন"},
-  {id:41,n:"Canola – Meal, solvent",b:"ক্যানোলা মিল",c:"protein",dm:82.0,tdn:69,nem:1.60,neg:1.00,cp:40.9,uip:28,ee:3.47,ndf:27.2,adf:17.0,ca:0.67,p:0.97},
-  {id:42,n:"Corn – Gluten Meal",b:"ভুট্টা গ্লুটেন মিল",c:"protein",dm:88.2,tdn:89,nem:2.20,neg:1.52,cp:66.3,uip:59,ee:2.56,ndf:8.9,adf:7.9,ca:0.15,p:0.44},
-  {id:43,n:"Cottonseed – Meal, solvent",b:"তুলার বীজ মিল",c:"protein",dm:90.2,tdn:75,nem:1.79,neg:1.16,cp:46.1,uip:43,ee:3.15,ndf:28.9,adf:17.9,ca:0.20,p:0.12,notes:"গসিপল সতর্কতা"},
-  {id:44,n:"Fish Meal – dried",b:"মাছের গুঁড়া",c:"protein",dm:93.3,tdn:68,nem:1.57,neg:0.97,cp:85.8,uip:76,ee:7.21,ndf:54.9,adf:18.3,ca:4.0,p:1.50},
-  {id:45,n:"Linseed – Meal",b:"তিসির খৈল",c:"protein",dm:92.0,tdn:79,nem:1.91,neg:1.27,cp:71.2,uip:60,ee:4.6,ndf:0,adf:0,ca:0.43,p:0.83,notes:"ওমেগা-৩ সমৃদ্ধ"},
-  {id:46,n:"Meat Meal – rendered",b:"মাংস মিল",c:"protein",dm:93.8,tdn:71,nem:1.66,neg:1.05,cp:58.2,uip:56,ee:11.0,ndf:48.2,adf:6.35,ca:9.90,p:4.70,notes:"উচ্চ Ca ও P"},
-  {id:47,n:"Mustard Cake (Sarisha Khail)",b:"সরিষার খৈল",c:"protein",dm:90.0,tdn:70,nem:1.65,neg:1.05,cp:38.0,uip:30,ee:7.5,ndf:28.0,adf:18.0,ca:0.50,p:0.95,notes:"বাংলাদেশে সর্বাধিক ব্যবহৃত প্রোটিন"},
-  {id:48,n:"Peanut – Meal",b:"চিনাবাদামের খৈল",c:"protein",dm:90.9,tdn:84,nem:2.06,neg:1.40,cp:51.8,uip:34,ee:1.67,ndf:10.3,adf:7.0,ca:0.20,p:0.65,notes:"বাংলাদেশে পাওয়া যায়"},
-  {id:49,n:"Soybean – Meal, solvent",b:"সয়াবিন মিল",c:"protein",dm:89.1,tdn:84,nem:2.06,neg:1.40,cp:49.9,uip:34,ee:1.6,ndf:14.9,adf:10.0,ca:0.34,p:0.69,notes:"সবচেয়ে জনপ্রিয় প্রোটিন সাপ্লিমেন্ট"},
-  {id:50,n:"Soybean – Meal, expeller",b:"সয়াবিন মিল (এক্সপেলার)",c:"protein",dm:89.9,tdn:87,nem:2.15,neg:1.48,cp:54.0,uip:34,ee:1.1,ndf:7.79,adf:6.1,ca:0.27,p:0.65},
-  {id:51,n:"Khesari Dal – Bran",b:"খেসারির ভুষি",c:"protein",dm:87.0,tdn:68,nem:1.55,neg:0.96,cp:26.0,uip:25,ee:1.5,ndf:20.0,adf:9.0,ca:0.20,p:0.40,notes:"সীমিত ব্যবহার করুন; নিউরোলাথাইরিজম"},
-  // ─── BY-PRODUCTS ───
-  {id:60,n:"Beet Pulp – dehydrated",b:"বিট পাল্প (শুকনো)",c:"byproduct",dm:91.0,tdn:74,nem:1.76,neg:1.14,cp:9.8,uip:45,ee:0.6,ndf:44.6,adf:27.5,ca:0.59,p:0.10,notes:"রুমেন বান্ধব আঁশ"},
-  {id:61,n:"Corn – Distillers Grains",b:"ভুট্টা ডিস্টিলার্স গ্রেইন",c:"byproduct",dm:90.3,tdn:90,nem:2.18,neg:1.50,cp:30.4,uip:52,ee:10.7,ndf:46.0,adf:21.3,ca:0.29,p:0.70},
-  {id:62,n:"Corn – Gluten Feed",b:"ভুট্টা গ্লুটেন ফিড",c:"byproduct",dm:90.0,tdn:80,nem:1.94,neg:1.30,cp:23.8,uip:22,ee:3.91,ndf:36.2,adf:12.7,ca:0.30,p:0.80},
-  {id:63,n:"Cottonseed – Whole",b:"তুলার সম্পূর্ণ বীজ",c:"byproduct",dm:89.4,tdn:90,nem:2.24,neg:1.55,cp:24.4,uip:27,ee:17.5,ndf:51.6,adf:41.8,ca:0.16,p:0.57,notes:"উচ্চ চর্বি ও প্রোটিন"},
-  {id:64,n:"Rice – Bran",b:"ধানের কুঁড়া",c:"byproduct",dm:90.4,tdn:65,nem:1.47,neg:0.88,cp:14.0,uip:25,ee:13.5,ndf:28.0,adf:11.0,ca:0.10,p:1.50,notes:"বাংলাদেশে প্রচুর; তাজা ব্যবহার করুন"},
-  {id:65,n:"Rice – Polishings",b:"চালের পলিশিং",c:"byproduct",dm:90.0,tdn:78,nem:1.86,neg:1.23,cp:12.5,uip:20,ee:14.0,ndf:18.0,adf:7.0,ca:0.06,p:1.30},
-  {id:66,n:"Wheat – Bran",b:"গমের ভুষি",c:"byproduct",dm:88.6,tdn:65,nem:1.47,neg:0.88,cp:17.0,uip:25,ee:4.3,ndf:43.8,adf:12.7,ca:0.13,p:1.26,notes:"বাংলাদেশে সহজলভ্য"},
-  {id:67,n:"Wheat – Flour",b:"গমের আটা",c:"byproduct",dm:87.5,tdn:82,nem:2.02,neg:1.38,cp:14.5,uip:20,ee:1.8,ndf:15.0,adf:4.2,ca:0.05,p:0.42},
-  // ─── FATS & OILS ───
-  {id:70,n:"Fat – Animal (Tallow)",b:"পশু চর্বি (ট্যালো)",c:"fat",dm:99.2,tdn:177,nem:6.00,neg:4.50,cp:0,uip:0,ee:99.2,ndf:0,adf:0,ca:0,p:0,notes:"বিশুদ্ধ শক্তি; মিশ্রণে ব্যবহার; সর্বোচ্চ ৫%"},
-  {id:71,n:"Oil – Vegetable",b:"উদ্ভিজ্জ তেল",c:"fat",dm:99.8,tdn:177,nem:4.75,neg:3.51,cp:0,uip:0,ee:99.9,ndf:0,adf:0,ca:0,p:0,notes:"শক্তি সাপ্লিমেন্ট; সর্বোচ্চ ৫% DM"},
-  // ─── SUPPLEMENTS ───
-  {id:80,n:"Molasses – Sugarcane",b:"আখের গুড় / মোলাসেস",c:"supplement",dm:74.3,tdn:72,nem:1.70,neg:1.08,cp:5.8,uip:20,ee:0.2,ndf:0,adf:0.4,ca:0.90,p:0.10,notes:"বাংলাদেশে সহজলভ্য; সর্বোচ্চ ১০–১৫% DM"},
-  {id:81,n:"Molasses – Beet Sugar",b:"চিনির মোলাসেস",c:"supplement",dm:77.9,tdn:75,nem:1.79,neg:1.16,cp:8.5,uip:20,ee:0.2,ndf:0,adf:0,ca:0.17,p:0.02,notes:"খাদ্যগ্রহণ বাড়ায়"},
-  {id:82,n:"Urea (NPN)",b:"ইউরিয়া (NPN)",c:"supplement",dm:99.5,tdn:0,nem:0,neg:0,cp:281,uip:0,ee:0,ndf:0,adf:0,ca:0,p:0,notes:"সর্বোচ্চ DM-এর ১%; সালফার সাথে দিন; বিষক্রিয়া সতর্ক"},
-  {id:83,n:"Mineral-Vitamin Premix",b:"মিনারেল ভিটামিন প্রিমিক্স",c:"supplement",dm:98.0,tdn:0,nem:0,neg:0,cp:0,uip:0,ee:0,ndf:0,adf:0,ca:20.0,p:15.0,notes:"নির্মাতার নির্দেশ মানুন; ১–২% DM"},
-  {id:84,n:"Dicalcium Phosphate (DCP)",b:"ডাইক্যালসিয়াম ফসফেট",c:"supplement",dm:99.0,tdn:0,nem:0,neg:0,cp:0,uip:0,ee:0,ndf:0,adf:0,ca:22.0,p:18.5,notes:"Ca ও P উভয় সরবরাহ"},
-  {id:85,n:"Common Salt (NaCl)",b:"সাধারণ লবণ",c:"supplement",dm:99.0,tdn:0,nem:0,neg:0,cp:0,uip:0,ee:0,ndf:0,adf:0,ca:0,p:0,notes:"DM-এর ০.২–০.৫%"},
-  {id:86,n:"Dhal Bran (Masur/Mung)",b:"ডালের ভুষি (মসুর/মুগ)",c:"byproduct",dm:88.0,tdn:71,nem:1.66,neg:1.05,cp:22.0,uip:25,ee:1.5,ndf:32.0,adf:14.0,ca:0.30,p:0.50,notes:"ডাল কলের উপজাত; বাংলাদেশে সহজলভ্য"},
-  {id:87,n:"Sesame Meal (Til Khail)",b:"তিলের খৈল",c:"protein",dm:90.0,tdn:74,nem:1.76,neg:1.14,cp:42.0,uip:28,ee:5.5,ndf:22.0,adf:12.0,ca:2.0,p:1.10,notes:"উচ্চ Ca; বাংলাদেশে পাওয়া যায়"},
-  {id:88,n:"Coconut Meal",b:"নারকেল খৈল",c:"protein",dm:90.0,tdn:74,nem:1.76,neg:1.14,cp:21.0,uip:40,ee:8.0,ndf:45.0,adf:25.0,ca:0.15,p:0.55,notes:"উপকূলীয় এলাকায় সহজলভ্য"},
-  {id:89,n:"Jute Leaves – Fresh",b:"পাটের পাতা তাজা",c:"local",dm:18.0,tdn:58,nem:1.24,neg:0.68,cp:18.0,uip:20,ee:2.5,ndf:38.0,adf:26.0,ca:1.20,p:0.30,notes:"পাট কাটার সময় পাওয়া যায়; উচ্চ প্রোটিন"},
-  {id:90,n:"Water Hyacinth – Fresh",b:"কচুরিপানা তাজা",c:"local",dm:5.0,tdn:42,nem:0.68,neg:0.15,cp:14.0,uip:15,ee:1.2,ndf:55.0,adf:38.0,ca:0.80,p:0.20,notes:"পানির পরিমাণ ৯৫%; প্রথমে শুকিয়ে নিন"},
-  {id:91,n:"Azolla – Fresh",b:"অ্যাজোলা তাজা",c:"local",dm:5.0,tdn:55,nem:1.10,neg:0.55,cp:25.0,uip:18,ee:3.5,ndf:20.0,adf:12.0,ca:1.10,p:0.55,notes:"উচ্চ প্রোটিন; সহজে চাষযোগ্য; পুকুরে জন্মায়"},
-  {id:92,n:"Sweet Potato Vines – Fresh",b:"মিষ্টি আলুর লতা-পাতা",c:"local",dm:14.0,tdn:62,nem:1.38,neg:0.80,cp:16.0,uip:20,ee:3.0,ndf:42.0,adf:28.0,ca:1.20,p:0.35,notes:"বাংলাদেশে সহজলভ্য; উচ্চ প্রোটিন ও ভিটামিন"},
+  {id:1,name:"Alfalfa Meal",name_bn:"আলফালফা মিল",nrc_id:"NRC16F1",c:"protein",dm:90.7,ash:11.7,cp:19.5,adf:33.9,ndf:42.9,starch:1.8,ee:2.35,de:2.5,nem:1.44,neg:0.995,tdn:56.7,ca:1.5,p:0.27,price_tk:45,deleted:false},
+  {id:2,name:"Almond Hulls",name_bn:"আমন্ড ভুসি",nrc_id:"NRC16F2",c:"roughage",dm:88.2,ash:7.6,cp:5.3,adf:27.6,ndf:33.0,starch:0.9,ee:2.52,de:2.44,nem:1.405,neg:0.971,tdn:55.3,ca:0.27,p:0.12,price_tk:5,deleted:false},
+  {id:3,name:"Apple Pomace, By-product, Wet",name_bn:"আপেল পোমাস (ভেজা)",nrc_id:"NRC16F3",c:"byproduct",dm:18.2,ash:2.9,cp:6.4,adf:38.6,ndf:45.7,starch:3.5,ee:5.97,de:2.29,nem:1.319,neg:0.911,tdn:51.9,ca:0.15,p:0.14,price_tk:20,deleted:false},
+  {id:4,name:"Bakery By-product, Bread Waste",name_bn:"বেকারি উপজাত (পাউরুটি)",nrc_id:"NRC16F5",c:"byproduct",dm:67.4,ash:3.6,cp:14.9,adf:3.2,ndf:6.3,starch:53.5,ee:5.76,de:3.66,nem:2.108,neg:1.457,tdn:83.0,ca:0.22,p:0.26,price_tk:20,deleted:false},
+  {id:5,name:"Bakery By-product, Cereal",name_bn:"বেকারি উপজাত (সিরিয়াল)",nrc_id:"NRC16F6",c:"byproduct",dm:91.1,ash:3.5,cp:9.2,adf:3.1,ndf:7.2,starch:47.6,ee:2.95,de:3.44,nem:1.981,neg:1.369,tdn:78.0,ca:0.22,p:0.28,price_tk:20,deleted:false},
+  {id:6,name:"Bakery By-product, Cookies",name_bn:"বেকারি উপজাত (কুকিজ)",nrc_id:"NRC16F7",c:"byproduct",dm:89.3,ash:4.6,cp:12.9,adf:7.6,ndf:14.4,starch:36.2,ee:10.04,de:3.59,nem:2.068,neg:1.429,tdn:81.4,ca:0.24,p:0.19,price_tk:20,deleted:false},
+  {id:7,name:"Bakery By-product Meal",name_bn:"বেকারি উপজাত মিল",nrc_id:"NRC16F4",c:"protein",dm:90.1,ash:4.4,cp:12.8,adf:5.6,ndf:12.7,starch:51.7,ee:8.68,de:3.6,nem:2.074,neg:1.433,tdn:81.7,ca:0.37,p:0.3,price_tk:45,deleted:false},
+  {id:8,name:"Barley Grain, Dry, Ground",name_bn:"যব দানা (শুকনো, গুঁড়া)",nrc_id:"NRC16F8",c:"grain",dm:88.7,ash:2.8,cp:11.8,adf:7.3,ndf:18.6,starch:56.7,ee:2.31,de:3.36,nem:1.935,neg:1.337,tdn:76.2,ca:0.12,p:0.38,price_tk:35,deleted:false},
+  {id:9,name:"Barley Silage, Mid-Maturity",name_bn:"যব সাইলেজ (মধ্য পরিপক্ক)",nrc_id:"NRC16F12",c:"roughage",dm:36.1,ash:7.9,cp:11.4,adf:34.1,ndf:52.9,starch:12.3,ee:3.13,de:2.62,nem:1.509,neg:1.043,tdn:59.4,ca:0.46,p:0.31,price_tk:5,deleted:false},
+  {id:10,name:"Barley Silage, Vegetative",name_bn:"যব সাইলেজ (কচি)",nrc_id:"NRC16F13",c:"roughage",dm:33.0,ash:10.7,cp:14.2,adf:37.7,ndf:56.6,starch:3.0,ee:3.65,de:2.32,nem:1.336,neg:0.923,tdn:52.6,ca:0.53,p:0.35,price_tk:5,deleted:false},
+  {id:11,name:"Beet Pulp, Dry",name_bn:"বিট পাল্প (শুকনো)",nrc_id:"NRC16F14",c:"byproduct",dm:92.3,ash:5.2,cp:9.9,adf:28.2,ndf:46.9,starch:0.6,ee:1.06,de:2.75,nem:1.584,neg:1.095,tdn:62.4,ca:0.77,p:0.08,price_tk:20,deleted:false},
+  {id:12,name:"Beet Pulp, Dry, Molasses Added",name_bn:"বিট পাল্প (মোলাসেস সহ)",nrc_id:"NRC16F15",c:"byproduct",dm:90.6,ash:7.5,cp:8.9,adf:39.7,ndf:39.3,starch:1.1,ee:1.19,de:2.74,nem:1.578,neg:1.091,tdn:62.1,ca:1.18,p:0.09,price_tk:20,deleted:false},
+  {id:13,name:"Beet Pulp, Wet",name_bn:"বিট পাল্প (ভেজা)",nrc_id:"NRC16F16",c:"byproduct",dm:22.7,ash:7.3,cp:9.1,adf:27.2,ndf:44.1,starch:0.9,ee:0.99,de:2.73,nem:1.572,neg:1.087,tdn:61.9,ca:1.12,p:0.13,price_tk:20,deleted:false},
+  {id:14,name:"Bermudagrass Hay",name_bn:"বার্মুডা ঘাস হে",nrc_id:"NRC16F17",c:"roughage",dm:93.4,ash:8.0,cp:11.0,adf:34.9,ndf:65.4,starch:4.9,ee:1.93,de:2.4,nem:1.382,neg:0.955,tdn:54.4,ca:0.38,p:0.19,price_tk:5,deleted:false},
+  {id:15,name:"Bermudagrass Silage, Mature",name_bn:"বার্মুডা ঘাস সাইলেজ (পরিপক্ক)",nrc_id:"NRC16F18",c:"roughage",dm:45.3,ash:6.2,cp:10.3,adf:42.8,ndf:70.8,starch:3.4,ee:2.38,de:2.26,nem:1.302,neg:0.899,tdn:51.3,ca:0.47,p:0.24,price_tk:5,deleted:false},
+  {id:16,name:"Bermudagrass Silage, Mid-Maturity",name_bn:"বার্মুডা ঘাস সাইলেজ (মধ্য)",nrc_id:"NRC16F19",c:"roughage",dm:38.4,ash:9.1,cp:14.6,adf:39.0,ndf:63.5,starch:2.4,ee:3.37,de:2.39,nem:1.377,neg:0.951,tdn:54.2,ca:0.51,p:0.31,price_tk:5,deleted:false},
+  {id:17,name:"Blood Meal, High dRUP",name_bn:"ব্লাড মিল (উচ্চ dRUP)",nrc_id:"NRC16F1000",c:"protein",dm:90.9,ash:3.3,cp:95.1,adf:0.0,ndf:0.0,starch:0.0,ee:1.69,de:4.56,nem:2.627,neg:1.815,tdn:103.4,ca:0.13,p:0.28,price_tk:70,deleted:false},
+  {id:18,name:"Blood Meal, Low dRUP",name_bn:"ব্লাড মিল (নিম্ন dRUP)",nrc_id:"NRC16F20",c:"protein",dm:90.9,ash:3.3,cp:95.1,adf:0.0,ndf:0.0,starch:0.0,ee:1.69,de:3.82,nem:2.2,neg:1.52,tdn:86.6,ca:0.13,p:0.28,price_tk:45,deleted:false},
+  {id:19,name:"Brewers Grains, Dry",name_bn:"ব্রিউয়ার্স গ্রেইন (শুকনো)",nrc_id:"NRC16F21",c:"grain",dm:93.1,ash:4.6,cp:25.3,adf:24.7,ndf:51.8,starch:6.5,ee:9.02,de:2.98,nem:1.716,neg:1.186,tdn:67.6,ca:0.3,p:0.64,price_tk:35,deleted:false},
+  {id:20,name:"Brewers Grains, Wet",name_bn:"ব্রিউয়ার্স গ্রেইন (ভেজা)",nrc_id:"NRC16F22",c:"grain",dm:22.5,ash:4.6,cp:28.1,adf:23.8,ndf:49.3,starch:5.2,ee:9.52,de:3.11,nem:1.791,neg:1.238,tdn:70.5,ca:0.36,p:0.69,price_tk:35,deleted:false},
+  {id:21,name:"Brewers Yeast, Dry",name_bn:"ব্রিউয়ার্স ইস্ট (শুকনো)",nrc_id:"NRC16F23",c:"protein",dm:92.8,ash:8.6,cp:50.7,adf:3.6,ndf:1.6,starch:4.1,ee:1.11,de:3.94,nem:2.269,neg:1.568,tdn:89.4,ca:0.12,p:1.19,price_tk:45,deleted:false},
+  {id:22,name:"Brewers Yeast, Wet",name_bn:"ব্রিউয়ার্স ইস্ট (ভেজা)",nrc_id:"NRC16F24",c:"protein",dm:13.4,ash:6.3,cp:43.3,adf:5.6,ndf:11.5,starch:4.4,ee:3.34,de:3.85,nem:2.218,neg:1.532,tdn:87.3,ca:0.37,p:1.49,price_tk:45,deleted:false},
+  {id:23,name:"Calcium Soaps",name_bn:"ক্যালসিয়াম সোপ (ফ্যাট সাপ্লিমেন্ট)",nrc_id:"NRC16F25",c:"supplement",dm:95.3,ash:15.5,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:84.5,de:5.42,nem:3.122,neg:2.157,tdn:122.9,ca:0.0,p:0.0,price_tk:80,deleted:false},
+  {id:24,name:"Candy By-product, Not Chocolate",name_bn:"ক্যান্ডি উপজাত",nrc_id:"NRC16F26",c:"byproduct",dm:90.1,ash:1.0,cp:2.4,adf:1.5,ndf:2.3,starch:23.5,ee:1.25,de:3.48,nem:2.004,neg:1.385,tdn:78.9,ca:0.06,p:0.03,price_tk:20,deleted:false},
+  {id:25,name:"Candy By-product, High Protein",name_bn:"ক্যান্ডি উপজাত (উচ্চ প্রোটিন)",nrc_id:"NRC16F27",c:"byproduct",dm:88.9,ash:5.6,cp:14.6,adf:19.5,ndf:29.7,starch:16.1,ee:12.11,de:3.31,nem:1.907,neg:1.317,tdn:75.1,ca:0.32,p:0.49,price_tk:20,deleted:false},
+  {id:26,name:"Canola Meal, Solvent Extracted",name_bn:"ক্যানোলা মিল",nrc_id:"NRC16F28",c:"protein",dm:89.1,ash:7.9,cp:41.5,adf:20.3,ndf:29.0,starch:1.6,ee:3.51,de:3.14,nem:1.809,neg:1.25,tdn:71.2,ca:0.79,p:1.15,price_tk:45,deleted:false},
+  {id:27,name:"Canola Seed, Ground",name_bn:"ক্যানোলা বীজ (গুঁড়া)",nrc_id:"NRC16F29",c:"grain",dm:95.0,ash:4.5,cp:23.4,adf:20.2,ndf:28.7,starch:2.4,ee:40.46,de:4.31,nem:2.483,neg:1.715,tdn:97.8,ca:0.44,p:0.69,price_tk:35,deleted:false},
+  {id:28,name:"Chocolate By-product",name_bn:"চকলেট উপজাত",nrc_id:"NRC16F30",c:"byproduct",dm:94.3,ash:2.6,cp:10.0,adf:8.3,ndf:13.2,starch:11.2,ee:21.68,de:4.05,nem:2.333,neg:1.612,tdn:91.9,ca:0.15,p:0.28,price_tk:20,deleted:false},
+  {id:29,name:"Citrus Pulp, Dry",name_bn:"সাইট্রাস পাল্প (শুকনো)",nrc_id:"NRC16F31",c:"byproduct",dm:88.2,ash:7.1,cp:7.2,adf:20.1,ndf:24.1,starch:1.3,ee:2.55,de:3.02,nem:1.74,neg:1.202,tdn:68.5,ca:1.86,p:0.12,price_tk:20,deleted:false},
+  {id:30,name:"Citrus Pulp, Wet",name_bn:"সাইট্রাস পাল্প (ভেজা)",nrc_id:"NRC16F32",c:"byproduct",dm:18.3,ash:6.8,cp:8.7,adf:23.2,ndf:25.9,starch:0.9,ee:3.42,de:2.97,nem:1.711,neg:1.182,tdn:67.4,ca:1.27,p:0.16,price_tk:20,deleted:false},
+  {id:31,name:"Cool-Season Grass Hay, Mature",name_bn:"শীতকালীন ঘাস হে (পরিপক্ক)",nrc_id:"NRC16F33",c:"roughage",dm:89.8,ash:6.7,cp:9.2,adf:41.4,ndf:66.7,starch:2.0,ee:2.35,de:2.34,nem:1.348,neg:0.931,tdn:53.1,ca:0.44,p:0.21,price_tk:5,deleted:false},
+  {id:32,name:"Cool-Season Grass Hay, Mid-Maturity",name_bn:"শীতকালীন ঘাস হে (মধ্য)",nrc_id:"NRC16F34",c:"roughage",dm:88.3,ash:8.6,cp:13.3,adf:35.5,ndf:58.0,starch:2.2,ee:3.23,de:2.53,nem:1.457,neg:1.007,tdn:57.4,ca:0.48,p:0.23,price_tk:5,deleted:false},
+  {id:33,name:"Cool-Season Grass Silage",name_bn:"শীতকালীন ঘাস সাইলেজ",nrc_id:"NRC16F35",c:"roughage",dm:38.8,ash:8.1,cp:13.4,adf:39.0,ndf:62.1,starch:1.9,ee:3.63,de:2.44,nem:1.405,neg:0.971,tdn:55.3,ca:0.55,p:0.31,price_tk:5,deleted:false},
+  {id:34,name:"Corn, Ear with Husk, Ensiled, High Fiber",name_bn:"ভুট্টা কান সাইলেজ (উচ্চ আঁশ)",nrc_id:"NRC16F53",c:"grain",dm:58.0,ash:2.1,cp:7.9,adf:12.3,ndf:24.9,starch:56.7,ee:3.37,de:3.26,nem:1.878,neg:1.297,tdn:73.9,ca:0.07,p:0.26,price_tk:35,deleted:false},
+  {id:35,name:"Corn, Ear with Husk, Ensiled, Low Fiber",name_bn:"ভুট্টা কান সাইলেজ (নিম্ন আঁশ)",nrc_id:"NRC16F54",c:"grain",dm:64.8,ash:1.7,cp:7.8,adf:8.4,ndf:18.1,starch:64.6,ee:3.56,de:3.36,nem:1.935,neg:1.337,tdn:76.2,ca:0.04,p:0.28,price_tk:35,deleted:false},
+  {id:36,name:"Corn and Cob Meal, Dry",name_bn:"ভুট্টা ও কব মিল (শুকনো)",nrc_id:"NRC16F36",c:"roughage",dm:86.3,ash:1.9,cp:8.4,adf:8.8,ndf:19.0,starch:62.1,ee:3.69,de:3.35,nem:1.93,neg:1.333,tdn:76.0,ca:0.05,p:0.29,price_tk:5,deleted:false},
+  {id:37,name:"Corn Cobs",name_bn:"ভুট্টার কব",nrc_id:"NRC16F37",c:"roughage",dm:89.8,ash:2.8,cp:3.0,adf:46.3,ndf:83.8,starch:1.1,ee:0.62,de:2.41,nem:1.388,neg:0.959,tdn:54.7,ca:0.04,p:0.06,price_tk:5,deleted:false},
+  {id:38,name:"Corn Germ",name_bn:"ভুট্টার জার্ম",nrc_id:"NRC16F38",c:"grain",dm:90.2,ash:5.9,cp:15.4,adf:10.1,ndf:27.0,starch:27.6,ee:16.89,de:3.63,nem:2.091,neg:1.445,tdn:82.3,ca:0.03,p:1.17,price_tk:35,deleted:false},
+  {id:39,name:"Corn Germ Meal",name_bn:"ভুট্টার জার্ম মিল",nrc_id:"NRC16F39",c:"protein",dm:90.2,ash:3.7,cp:26.1,adf:15.2,ndf:44.8,starch:19.4,ee:3.11,de:3.21,nem:1.849,neg:1.278,tdn:72.8,ca:0.04,p:0.06,price_tk:45,deleted:false},
+  {id:40,name:"Corn Gluten Feed, Dry",name_bn:"কর্ন গ্লুটেন ফিড (শুকনো)",nrc_id:"NRC16F40",c:"grain",dm:89.2,ash:7.5,cp:23.2,adf:11.5,ndf:35.7,starch:15.5,ee:3.91,de:3.23,nem:1.86,neg:1.286,tdn:73.3,ca:0.07,p:0.31,price_tk:35,deleted:false},
+  {id:41,name:"Corn Gluten Feed, Wet",name_bn:"কর্ন গ্লুটেন ফিড (ভেজা)",nrc_id:"NRC16F41",c:"grain",dm:45.6,ash:7.2,cp:23.1,adf:12.1,ndf:36.9,starch:15.3,ee:3.81,de:3.23,nem:1.86,neg:1.286,tdn:73.3,ca:0.1,p:1.07,price_tk:35,deleted:false},
+  {id:42,name:"Corn Gluten Meal",name_bn:"কর্ন গ্লুটেন মিল",nrc_id:"NRC16F42",c:"protein",dm:90.5,ash:2.8,cp:68.5,adf:3.7,ndf:6.8,starch:16.4,ee:2.44,de:4.53,nem:2.609,neg:1.803,tdn:102.7,ca:0.04,p:0.49,price_tk:45,deleted:false},
+  {id:43,name:"Corn Grain, Coarse Grind",name_bn:"ভুট্টা দানা (মোটা গুঁড়া)",nrc_id:"NRC16F1071",c:"grain",dm:86.9,ash:1.5,cp:8.5,adf:3.6,ndf:9.8,starch:70.4,ee:3.84,de:3.55,nem:2.045,neg:1.413,tdn:80.5,ca:0.04,p:0.31,price_tk:38,deleted:false},
+  {id:44,name:"Corn Grain, Fine Grind",name_bn:"ভুট্টা দানা (সূক্ষ্ম গুঁড়া)",nrc_id:"NRC16F1070",c:"grain",dm:86.9,ash:1.5,cp:8.5,adf:3.5,ndf:9.6,starch:70.9,ee:3.84,de:3.55,nem:2.045,neg:1.413,tdn:80.5,ca:0.04,p:0.31,price_tk:38,deleted:false},
+  {id:45,name:"Corn Grain, Dry, Medium Grind",name_bn:"ভুট্টা দানা (শুকনো, মাঝারি গুঁড়া)",nrc_id:"NRC16F44",c:"grain",dm:86.9,ash:1.5,cp:8.5,adf:3.6,ndf:9.8,starch:70.4,ee:3.84,de:3.46,nem:1.993,neg:1.377,tdn:78.5,ca:0.04,p:0.31,price_tk:38,deleted:false},
+  {id:46,name:"Corn Grain High Moisture, Coarse Grind",name_bn:"ভুট্টা দানা (আর্দ্র, মোটা গুঁড়া)",nrc_id:"NRC16F1072",c:"grain",dm:72.3,ash:1.6,cp:8.5,adf:3.5,ndf:9.6,starch:70.9,ee:3.58,de:3.52,nem:2.028,neg:1.401,tdn:79.8,ca:0.04,p:0.31,price_tk:35,deleted:false},
+  {id:47,name:"Corn Grain High Moisture, Fine Grind",name_bn:"ভুট্টা দানা (আর্দ্র, সূক্ষ্ম গুঁড়া)",nrc_id:"NRC16F45",c:"grain",dm:72.3,ash:1.6,cp:8.5,adf:3.5,ndf:9.6,starch:70.9,ee:3.58,de:3.7,nem:2.131,neg:1.473,tdn:83.9,ca:0.04,p:0.31,price_tk:35,deleted:false},
+  {id:48,name:"Corn Grain Screenings",name_bn:"ভুট্টা দানা স্ক্রিনিং",nrc_id:"NRC16F43",c:"grain",dm:86.9,ash:1.8,cp:8.6,adf:4.4,ndf:11.7,starch:65.6,ee:3.19,de:3.46,nem:1.993,neg:1.377,tdn:78.5,ca:0.18,p:0.32,price_tk:35,deleted:false},
+  {id:49,name:"Corn Grain, Steam-Flaked",name_bn:"ভুট্টা দানা (স্টিম ফ্লেক)",nrc_id:"NRC16F46",c:"grain",dm:85.7,ash:1.3,cp:8.0,adf:3.4,ndf:8.6,starch:71.7,ee:3.14,de:3.63,nem:2.091,neg:1.445,tdn:82.3,ca:0.06,p:0.24,price_tk:35,deleted:false},
+  {id:50,name:"Corn Hominy",name_bn:"কর্ন হোমিনি",nrc_id:"NRC16F47",c:"grain",dm:89.1,ash:2.6,cp:10.1,adf:16.9,ndf:16.9,starch:55.6,ee:7.21,de:3.5,nem:2.016,neg:1.393,tdn:79.4,ca:0.06,p:0.52,price_tk:35,deleted:false},
+  {id:51,name:"Corn Silage, Immature",name_bn:"ভুট্টা সাইলেজ (কচি)",nrc_id:"NRC16F49",c:"roughage",dm:31.3,ash:4.0,cp:7.9,adf:25.5,ndf:42.6,starch:30.2,ee:2.96,de:2.93,nem:1.688,neg:1.166,tdn:66.5,ca:0.24,p:0.24,price_tk:5,deleted:false},
+  {id:52,name:"Corn Silage, Mature",name_bn:"ভুট্টা সাইলেজ (পরিপক্ক)",nrc_id:"NRC16F50",c:"roughage",dm:39.6,ash:3.7,cp:7.5,adf:23.2,ndf:39.3,starch:35.5,ee:2.86,de:2.88,nem:1.659,neg:1.146,tdn:65.3,ca:0.23,p:0.23,price_tk:5,deleted:false},
+  {id:53,name:"Corn Silage, Typical",name_bn:"ভুট্টা সাইলেজ (সাধারণ)",nrc_id:"NRC16F48",c:"roughage",dm:35.4,ash:3.8,cp:7.7,adf:24.3,ndf:40.9,starch:32.9,ee:2.92,de:2.93,nem:1.688,neg:1.166,tdn:66.5,ca:0.24,p:0.17,price_tk:6,deleted:false},
+  {id:54,name:"Corn Stalks, Ensiled, High DM",name_bn:"ভুট্টার ডগা সাইলেজ (উচ্চ DM)",nrc_id:"NRC16F52",c:"grain",dm:58.0,ash:9.0,cp:5.6,adf:46.9,ndf:72.0,starch:3.7,ee:1.21,de:2.16,nem:1.244,neg:0.86,tdn:49.0,ca:0.39,p:0.14,price_tk:5,deleted:false},
+  {id:55,name:"Corn Stalks, Ensiled, Low DM",name_bn:"ভুট্টার ডগা সাইলেজ (নিম্ন DM)",nrc_id:"NRC16F51",c:"grain",dm:41.2,ash:10.5,cp:7.0,adf:44.8,ndf:66.2,starch:3.5,ee:1.84,de:2.19,nem:1.261,neg:0.872,tdn:49.7,ca:0.48,p:0.23,price_tk:35,deleted:false},
+  {id:56,name:"Cotton Gin Trash",name_bn:"তুলার আবর্জনা",nrc_id:"NRC16F55",c:"roughage",dm:90.3,ash:14.5,cp:12.0,adf:51.0,ndf:59.4,starch:1.1,ee:4.01,de:1.67,nem:0.962,neg:0.665,tdn:37.9,ca:1.69,p:0.11,price_tk:5,deleted:false},
+  {id:57,name:"Cottonseed Hulls",name_bn:"তুলার বীজের খোসা",nrc_id:"NRC16F57",c:"roughage",dm:91.0,ash:3.5,cp:7.0,adf:66.0,ndf:80.9,starch:1.2,ee:3.2,de:1.58,nem:0.91,neg:0.629,tdn:35.8,ca:0.23,p:0.15,price_tk:5,deleted:false},
+  {id:58,name:"Cottonseed Meal",name_bn:"তুলার বীজের খৈল",nrc_id:"NRC16F58",c:"protein",dm:89.9,ash:7.6,cp:46.7,adf:19.2,ndf:28.1,starch:1.1,ee:3.6,de:3.32,nem:1.912,neg:1.321,tdn:75.3,ca:0.25,p:1.31,price_tk:40,deleted:false},
+  {id:59,name:"Cottonseed Whole, Linted",name_bn:"তুলার পূর্ণ বীজ",nrc_id:"NRC16F56",c:"grain",dm:91.4,ash:4.2,cp:23.3,adf:38.6,ndf:50.6,starch:0.8,ee:18.62,de:3.15,nem:1.814,neg:1.254,tdn:71.4,ca:0.17,p:0.62,price_tk:35,deleted:false},
+  {id:60,name:"Distillers Grains and Solubles, Dried, High Fat",name_bn:"ডিস্টিলার্স গ্রেইন (শুকনো, উচ্চ ফ্যাট)",nrc_id:"NRC16F59",c:"grain",dm:89.1,ash:5.4,cp:30.2,adf:14.6,ndf:32.1,starch:4.5,ee:12.54,de:3.49,nem:2.01,neg:1.389,tdn:79.2,ca:0.12,p:0.88,price_tk:35,deleted:false},
+  {id:61,name:"Distillers Grains and Solubles, Dried, High Protein",name_bn:"ডিস্টিলার্স গ্রেইন (শুকনো, উচ্চ প্রোটিন)",nrc_id:"NRC16F60",c:"grain",dm:91.1,ash:4.0,cp:39.0,adf:17.7,ndf:37.6,starch:6.2,ee:7.56,de:3.34,nem:1.924,neg:1.329,tdn:75.8,ca:0.08,p:0.64,price_tk:35,deleted:false},
+  {id:62,name:"Distillers Grains and Solubles, Dried, Low Fat",name_bn:"ডিস্টিলার্স গ্রেইন (শুকনো, নিম্ন ফ্যাট)",nrc_id:"NRC16F61",c:"grain",dm:89.9,ash:5.3,cp:31.0,adf:14.8,ndf:30.8,starch:6.1,ee:8.9,de:3.44,nem:1.981,neg:1.369,tdn:78.0,ca:0.11,p:0.89,price_tk:35,deleted:false},
+  {id:63,name:"Distillers Grains and Solubles, Modified Wet",name_bn:"ডিস্টিলার্স গ্রেইন (আর্দ্র)",nrc_id:"NRC16F62",c:"grain",dm:49.2,ash:5.6,cp:30.3,adf:14.4,ndf:27.1,starch:4.7,ee:9.35,de:3.5,nem:2.016,neg:1.393,tdn:79.4,ca:0.21,p:0.86,price_tk:35,deleted:false},
+  {id:64,name:"Distillers Grains and Solubles, Wet",name_bn:"ডিস্টিলার্স গ্রেইন (ভেজা)",nrc_id:"NRC16F63",c:"grain",dm:33.2,ash:4.5,cp:31.5,adf:16.1,ndf:31.7,starch:6.3,ee:9.31,de:3.5,nem:2.016,neg:1.393,tdn:79.4,ca:0.13,p:0.76,price_tk:35,deleted:false},
+  {id:65,name:"Distillers Solubles",name_bn:"ডিস্টিলার্স সলিউবলস",nrc_id:"NRC16F64",c:"protein",dm:31.2,ash:11.1,cp:22.6,adf:3.2,ndf:4.8,starch:4.0,ee:10.99,de:3.62,nem:2.085,neg:1.441,tdn:82.1,ca:0.13,p:1.82,price_tk:45,deleted:false},
+  {id:66,name:"Fat, Canola Oil",name_bn:"ক্যানোলা তেল",nrc_id:"NRC16F65",c:"supplement",dm:99.0,ash:0.0,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:100.0,de:6.22,nem:3.583,neg:2.476,tdn:141.1,ca:0.0,p:0.0,price_tk:80,deleted:false},
+  {id:67,name:"Fat, Corn Oil",name_bn:"ভুট্টার তেল",nrc_id:"NRC16F66",c:"supplement",dm:99.0,ash:0.0,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:100.0,de:6.22,nem:3.583,neg:2.476,tdn:141.1,ca:0.0,p:0.0,price_tk:130,deleted:false},
+  {id:68,name:"Fat, Cottonseed Oil",name_bn:"তুলার বীজের তেল",nrc_id:"NRC16F67",c:"supplement",dm:99.0,ash:0.0,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:100.0,de:6.22,nem:3.583,neg:2.476,tdn:141.1,ca:0.0,p:0.0,price_tk:80,deleted:false},
+  {id:69,name:"Fat, Flaxseed Oil",name_bn:"তিসির তেল",nrc_id:"NRC16F69",c:"supplement",dm:99.0,ash:0.0,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:100.0,de:6.22,nem:3.583,neg:2.476,tdn:141.1,ca:0.0,p:0.0,price_tk:80,deleted:false},
+  {id:70,name:"Fat, Lard",name_bn:"লার্ড (শূকরের চর্বি)",nrc_id:"NRC16F68",c:"supplement",dm:99.8,ash:0.0,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:100.0,de:5.8,nem:3.341,neg:2.308,tdn:131.5,ca:0.0,p:0.0,price_tk:80,deleted:false},
+  {id:71,name:"Fat, Safflower Oil",name_bn:"কুসুম তেল",nrc_id:"NRC16F70",c:"supplement",dm:99.0,ash:0.0,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:100.0,de:6.22,nem:3.583,neg:2.476,tdn:141.1,ca:0.0,p:0.0,price_tk:80,deleted:false},
+  {id:72,name:"Fat, Soybean Oil",name_bn:"সয়াবিন তেল",nrc_id:"NRC16F71",c:"supplement",dm:99.0,ash:0.0,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:100.0,de:6.22,nem:3.583,neg:2.476,tdn:141.1,ca:0.0,p:0.0,price_tk:120,deleted:false},
+  {id:73,name:"Fat, Sunflower Oil",name_bn:"সূর্যমুখী তেল",nrc_id:"NRC16F72",c:"supplement",dm:99.0,ash:0.0,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:100.0,de:6.22,nem:3.583,neg:2.476,tdn:141.1,ca:0.0,p:0.0,price_tk:80,deleted:false},
+  {id:74,name:"Fat, Tallow",name_bn:"ট্যালো (পশু চর্বি)",nrc_id:"NRC16F73",c:"supplement",dm:99.8,ash:0.0,cp:0.0,adf:0.0,ndf:0.0,starch:0.0,ee:99.8,de:5.8,nem:3.341,neg:2.308,tdn:131.5,ca:0.0,p:0.0,price_tk:90,deleted:false},
+  {id:75,name:"Feather Meal",name_bn:"পালক মিল",nrc_id:"NRC16F74",c:"protein",dm:92.9,ash:2.3,cp:90.6,adf:0.0,ndf:0.0,starch:0.0,ee:8.92,de:4.12,nem:2.373,neg:1.64,tdn:93.4,ca:0.5,p:0.32,price_tk:45,deleted:false},
+  {id:76,name:"Fish Meal",name_bn:"মাছের গুঁড়া",nrc_id:"NRC16F75",c:"protein",dm:92.0,ash:21.1,cp:69.2,adf:0.0,ndf:0.0,starch:0.0,ee:10.48,de:3.63,nem:2.091,neg:1.445,tdn:82.3,ca:5.56,p:3.16,price_tk:80,deleted:false},
+  {id:77,name:"Flaxseed",name_bn:"তিসি বীজ",nrc_id:"NRC16F96",c:"grain",dm:92.7,ash:4.0,cp:22.8,adf:19.1,ndf:30.4,starch:2.4,ee:34.41,de:4.16,nem:2.396,neg:1.656,tdn:94.4,ca:0.24,p:0.59,price_tk:35,deleted:false},
+  {id:78,name:"Flaxseed Meal",name_bn:"তিসির খৈল",nrc_id:"NRC16F97",c:"protein",dm:89.6,ash:6.8,cp:38.5,adf:16.9,ndf:30.4,starch:1.4,ee:3.2,de:3.24,nem:1.866,neg:1.29,tdn:73.5,ca:0.44,p:0.95,price_tk:45,deleted:false},
+  {id:79,name:"Fruit and Vegetable By-product, Wet",name_bn:"ফল ও সবজি উপজাত (ভেজা)",nrc_id:"NRC16F77",c:"byproduct",dm:19.8,ash:8.4,cp:13.6,adf:22.4,ndf:28.7,starch:10.1,ee:7.13,de:3.27,nem:1.884,neg:1.301,tdn:74.2,ca:0.72,p:0.34,price_tk:20,deleted:false},
+  {id:80,name:"Glycerol",name_bn:"গ্লিসারল",nrc_id:"NRC16F1075",c:"supplement",dm:80.0,ash:6.7,cp:0.8,adf:0.0,ndf:0.0,starch:0.0,ee:0.0,de:3.29,nem:1.895,neg:1.309,tdn:74.6,ca:0.08,p:0.19,price_tk:80,deleted:false},
+  {id:81,name:"Grain Screenings, Source Unknown",name_bn:"দানাদার স্ক্রিনিং",nrc_id:"NRC16F79",c:"grain",dm:89.2,ash:6.0,cp:16.2,adf:17.7,ndf:34.1,starch:21.8,ee:3.91,de:3.03,nem:1.745,neg:1.206,tdn:68.7,ca:0.26,p:0.66,price_tk:35,deleted:false},
+  {id:82,name:"Grain Sorghum Hay",name_bn:"জোয়ার হে",nrc_id:"NRC16F80",c:"roughage",dm:92.6,ash:7.0,cp:8.8,adf:30.6,ndf:48.1,starch:22.2,ee:2.39,de:2.64,nem:1.521,neg:1.051,tdn:59.9,ca:0.32,p:0.22,price_tk:5,deleted:false},
+  {id:83,name:"Grain Sorghum Silage, Mature",name_bn:"জোয়ার সাইলেজ (পরিপক্ক)",nrc_id:"NRC16F81",c:"roughage",dm:31.3,ash:5.9,cp:8.2,adf:28.9,ndf:45.7,starch:23.2,ee:2.52,de:2.73,nem:1.572,neg:1.087,tdn:61.9,ca:0.28,p:0.2,price_tk:5,deleted:false},
+  {id:84,name:"Grain Sorghum Silage, Mid-Maturity",name_bn:"জোয়ার সাইলেজ (মধ্য)",nrc_id:"NRC16F82",c:"roughage",dm:29.8,ash:8.1,cp:8.9,adf:28.3,ndf:56.2,starch:14.3,ee:2.75,de:2.52,nem:1.452,neg:1.003,tdn:57.2,ca:0.37,p:0.23,price_tk:5,deleted:false},
+  {id:85,name:"Grass-Legume Mixtures, Mix Hay",name_bn:"ঘাস-লেগুম মিশ্রণ হে",nrc_id:"NRC16F89",c:"roughage",dm:86.4,ash:9.2,cp:12.1,adf:39.3,ndf:58.2,starch:2.7,ee:2.66,de:2.38,nem:1.371,neg:0.947,tdn:54.0,ca:0.74,p:0.25,price_tk:5,deleted:false},
+  {id:86,name:"Grass-Legume Mixtures, Mix Silage",name_bn:"ঘাস-লেগুম মিশ্রণ সাইলেজ",nrc_id:"NRC16F90",c:"roughage",dm:40.0,ash:9.5,cp:17.7,adf:39.3,ndf:51.2,starch:2.1,ee:4.04,de:2.6,nem:1.498,neg:1.035,tdn:59.0,ca:0.87,p:0.34,price_tk:5,deleted:false},
+  {id:87,name:"Grass-Legume Mixtures, Predominantly Grass, Hay, Mature",name_bn:"ঘাস-লেগুম হে (প্রধানত ঘাস, পরিপক্ক)",nrc_id:"NRC16F85",c:"roughage",dm:87.4,ash:7.5,cp:10.9,adf:34.0,ndf:62.0,starch:2.5,ee:2.43,de:2.4,nem:1.382,neg:0.955,tdn:54.4,ca:0.51,p:0.28,price_tk:5,deleted:false},
+  {id:88,name:"Grass-Legume Mixtures, Predominantly Grass, Hay, Mid-Maturity",name_bn:"ঘাস-লেগুম হে (প্রধানত ঘাস, মধ্য)",nrc_id:"NRC16F84",c:"roughage",dm:89.2,ash:9.4,cp:13.3,adf:33.8,ndf:54.7,starch:1.5,ee:3.39,de:2.64,nem:1.521,neg:1.051,tdn:59.9,ca:0.63,p:0.33,price_tk:5,deleted:false},
+  {id:89,name:"Grass-Legume Mixtures, Predominantly Grass, Silage",name_bn:"ঘাস-লেগুম সাইলেজ (প্রধানত ঘাস)",nrc_id:"NRC16F83",c:"roughage",dm:39.6,ash:8.1,cp:14.3,adf:37.0,ndf:57.7,starch:2.6,ee:3.75,de:2.55,nem:1.469,neg:1.015,tdn:57.8,ca:0.55,p:0.3,price_tk:5,deleted:false},
+  {id:90,name:"Grass-Legume Mixtures, Predominantly Legume, Hay, Immature",name_bn:"ঘাস-লেগুম হে (প্রধানত লেগুম, কচি)",nrc_id:"NRC16F87",c:"roughage",dm:88.6,ash:10.4,cp:20.3,adf:38.5,ndf:43.9,starch:1.9,ee:2.63,de:2.64,nem:1.521,neg:1.051,tdn:59.9,ca:1.24,p:0.3,price_tk:5,deleted:false},
+  {id:91,name:"Grass-Legume Mixtures, Predominantly Legume, Hay, Mature",name_bn:"ঘাস-লেগুম হে (প্রধানত লেগুম, পরিপক্ক)",nrc_id:"NRC16F86",c:"roughage",dm:85.3,ash:9.0,cp:17.4,adf:38.7,ndf:51.2,starch:2.5,ee:2.27,de:2.4,nem:1.382,neg:0.955,tdn:54.4,ca:1.24,p:0.28,price_tk:5,deleted:false},
+  {id:92,name:"Grass-Legume Mixtures, Predominantly Legume, Silage",name_bn:"ঘাস-লেগুম সাইলেজ (প্রধানত লেগুম)",nrc_id:"NRC16F88",c:"roughage",dm:41.0,ash:10.3,cp:20.0,adf:33.9,ndf:45.9,starch:6.6,ee:3.81,de:2.61,nem:1.503,neg:1.039,tdn:59.2,ca:1.26,p:0.35,price_tk:5,deleted:false},
+  {id:93,name:"Legume Hay, Immature",name_bn:"লেগুম হে (কচি)",nrc_id:"NRC16F91",c:"roughage",dm:89.3,ash:11.0,cp:21.5,adf:30.7,ndf:37.7,starch:2.3,ee:2.55,de:2.68,nem:1.544,neg:1.067,tdn:60.8,ca:1.51,p:0.29,price_tk:5,deleted:false},
+  {id:94,name:"Legume Hay, Mature",name_bn:"লেগুম হে (পরিপক্ক)",nrc_id:"NRC16F92",c:"roughage",dm:87.7,ash:10.0,cp:18.1,adf:37.2,ndf:46.6,starch:1.5,ee:2.25,de:2.63,nem:1.515,neg:1.047,tdn:59.7,ca:1.37,p:0.22,price_tk:5,deleted:false},
+  {id:95,name:"Legume Hay, Mid-Maturity",name_bn:"লেগুম হে (মধ্য পরিপক্ক)",nrc_id:"NRC16F93",c:"roughage",dm:88.1,ash:10.8,cp:20.7,adf:32.1,ndf:41.1,starch:1.5,ee:2.08,de:2.63,nem:1.515,neg:1.047,tdn:59.7,ca:1.4,p:0.24,price_tk:5,deleted:false},
+  {id:96,name:"Legume Silage, Immature",name_bn:"লেগুম সাইলেজ (কচি)",nrc_id:"NRC16F94",c:"roughage",dm:41.6,ash:11.1,cp:20.5,adf:32.0,ndf:41.5,starch:2.9,ee:3.22,de:2.79,nem:1.607,neg:1.11,tdn:63.3,ca:1.3,p:0.35,price_tk:5,deleted:false},
+  {id:97,name:"Legume Silage, Mid-Maturity",name_bn:"লেগুম সাইলেজ (মধ্য)",nrc_id:"NRC16F95",c:"roughage",dm:42.9,ash:10.6,cp:20.5,adf:33.7,ndf:43.2,starch:2.0,ee:2.87,de:2.59,nem:1.492,neg:1.031,tdn:58.7,ca:1.25,p:0.35,price_tk:5,deleted:false},
+  {id:98,name:"Meat and Bone Meal, Porcine",name_bn:"মাংস ও হাড়ের মিল",nrc_id:"NRC16F98",c:"protein",dm:96.1,ash:26.2,cp:56.6,adf:0.0,ndf:0.0,starch:0.0,ee:11.9,de:3.25,nem:1.872,neg:1.294,tdn:73.7,ca:9.29,p:4.59,price_tk:45,deleted:false},
+  {id:99,name:"Millet Hay",name_bn:"বাজরা হে",nrc_id:"NRC16F99",c:"roughage",dm:87.5,ash:11.2,cp:10.7,adf:39.7,ndf:61.9,starch:2.9,ee:1.95,de:2.25,nem:1.296,neg:0.896,tdn:51.0,ca:0.54,p:0.28,price_tk:5,deleted:false},
+  {id:100,name:"Millet Silage",name_bn:"বাজরা সাইলেজ",nrc_id:"NRC16F100",c:"roughage",dm:29.3,ash:11.7,cp:13.0,adf:39.2,ndf:59.7,starch:2.9,ee:1.47,de:2.25,nem:1.296,neg:0.896,tdn:51.0,ca:0.55,p:0.33,price_tk:5,deleted:false},
+  {id:101,name:"Molasses",name_bn:"মোলাসেস/ঝোলাগুড়",nrc_id:"NRC16F101",c:"byproduct",dm:65.4,ash:16.0,cp:9.3,adf:0.0,ndf:0.6,starch:0.8,ee:0.61,de:2.07,nem:1.192,neg:0.824,tdn:46.9,ca:0.73,p:0.26,price_tk:22,deleted:false},
+  {id:102,name:"Oat Grain, Rolled",name_bn:"ওট দানা (রোলড)",nrc_id:"NRC16F102",c:"grain",dm:89.3,ash:3.2,cp:12.2,adf:14.5,ndf:28.6,starch:44.7,ee:5.68,de:3.27,nem:1.884,neg:1.301,tdn:74.2,ca:0.38,p:0.38,price_tk:35,deleted:false},
+  {id:103,name:"Oat Hay",name_bn:"ওট হে",nrc_id:"NRC16F103",c:"roughage",dm:89.5,ash:7.4,cp:8.5,adf:37.5,ndf:59.0,starch:4.1,ee:2.36,de:2.51,nem:1.446,neg:0.999,tdn:56.9,ca:0.32,p:0.21,price_tk:5,deleted:false},
+  {id:104,name:"Oat Hulls",name_bn:"ওটের খোসা",nrc_id:"NRC16F104",c:"roughage",dm:91.4,ash:5.8,cp:5.0,adf:39.6,ndf:73.6,starch:1.3,ee:1.94,de:2.23,nem:1.284,neg:0.888,tdn:50.6,ca:0.15,p:0.09,price_tk:5,deleted:false},
+  {id:105,name:"Oat Silage, Immature",name_bn:"ওট সাইলেজ (কচি)",nrc_id:"NRC16F105",c:"roughage",dm:33.7,ash:13.4,cp:18.5,adf:31.7,ndf:45.8,starch:1.5,ee:4.23,de:2.58,nem:1.486,neg:1.027,tdn:58.5,ca:0.72,p:0.25,price_tk:5,deleted:false},
+  {id:106,name:"Oat Silage, Mid-Maturity",name_bn:"ওট সাইলেজ (মধ্য)",nrc_id:"NRC16F106",c:"roughage",dm:35.8,ash:10.4,cp:12.9,adf:38.8,ndf:57.4,starch:6.7,ee:3.64,de:2.41,nem:1.388,neg:0.959,tdn:54.7,ca:0.51,p:0.34,price_tk:5,deleted:false},
+  {id:107,name:"Pea Hay",name_bn:"মটর হে",nrc_id:"NRC16F107",c:"roughage",dm:89.5,ash:9.1,cp:15.9,adf:32.0,ndf:52.5,starch:2.2,ee:2.98,de:2.66,nem:1.532,neg:1.059,tdn:60.3,ca:1.04,p:0.28,price_tk:5,deleted:false},
+  {id:108,name:"Pea Silage",name_bn:"মটর সাইলেজ",nrc_id:"NRC16F108",c:"roughage",dm:31.7,ash:11.4,cp:17.0,adf:37.1,ndf:49.1,starch:2.9,ee:3.8,de:2.46,nem:1.417,neg:0.979,tdn:55.8,ca:0.88,p:0.24,price_tk:5,deleted:false},
+  {id:109,name:"Peanut Hay",name_bn:"চীনাবাদাম হে",nrc_id:"NRC16F109",c:"roughage",dm:91.3,ash:10.4,cp:12.0,adf:37.9,ndf:45.8,starch:4.0,ee:2.3,de:2.37,nem:1.365,neg:0.943,tdn:53.8,ca:1.34,p:0.17,price_tk:5,deleted:false},
+  {id:110,name:"Peanut Hulls",name_bn:"চীনাবাদামের খোসা",nrc_id:"NRC16F110",c:"roughage",dm:94.0,ash:4.6,cp:8.9,adf:59.8,ndf:69.6,starch:24.25,ee:4.21,de:1.57,nem:0.904,neg:0.625,tdn:35.6,ca:0.26,p:0.09,price_tk:5,deleted:false},
+  {id:111,name:"Peanut Meal, Expellers",name_bn:"চীনাবাদামের খৈল",nrc_id:"NRC16F111",c:"protein",dm:94.0,ash:6.5,cp:42.6,adf:15.9,ndf:22.9,starch:6.4,ee:8.46,de:3.73,nem:2.148,neg:1.485,tdn:84.6,ca:0.35,p:0.57,price_tk:45,deleted:false},
+  {id:112,name:"Peanut Skins",name_bn:"চীনাবাদামের ছাল",nrc_id:"NRC16F112",c:"grain",dm:92.4,ash:3.2,cp:16.2,adf:36.5,ndf:47.4,starch:17.85,ee:19.61,de:2.74,nem:1.578,neg:1.091,tdn:62.1,ca:0.3,p:0.16,price_tk:35,deleted:false},
+  {id:113,name:"Peanuts",name_bn:"চীনাবাদাম",nrc_id:"NRC16F113",c:"grain",dm:94.1,ash:3.0,cp:25.6,adf:17.3,ndf:24.0,starch:2.8,ee:42.24,de:4.6,nem:2.65,neg:1.831,tdn:104.3,ca:0.09,p:0.38,price_tk:35,deleted:false},
+  {id:114,name:"Peas",name_bn:"মটর শুঁটি দানা",nrc_id:"NRC16F114",c:"grain",dm:88.9,ash:3.6,cp:24.3,adf:7.9,ndf:14.2,starch:43.0,ee:2.08,de:3.67,nem:2.114,neg:1.461,tdn:83.2,ca:0.11,p:0.43,price_tk:35,deleted:false},
+  {id:115,name:"Pineapple Cannery Waste",name_bn:"আনারস প্রক্রিয়াজাত উপজাত",nrc_id:"NRC16F115",c:"byproduct",dm:23.4,ash:6.1,cp:7.0,adf:36.4,ndf:62.4,starch:3.4,ee:1.94,de:2.42,nem:1.394,neg:0.963,tdn:54.9,ca:0.43,p:0.15,price_tk:20,deleted:false},
+  {id:116,name:"Potato By-product Meal",name_bn:"আলু উপজাত মিল",nrc_id:"NRC16F116",c:"protein",dm:23.0,ash:5.6,cp:10.0,adf:10.7,ndf:14.4,starch:57.5,ee:2.78,de:3.16,nem:1.82,neg:1.258,tdn:71.7,ca:0.22,p:0.25,price_tk:45,deleted:false},
+  {id:117,name:"Poultry By-product Meal",name_bn:"পোল্ট্রি উপজাত মিল",nrc_id:"NRC16F117",c:"protein",dm:95.5,ash:14.2,cp:65.6,adf:0.0,ndf:0.0,starch:0.0,ee:12.78,de:4.25,nem:2.448,neg:1.692,tdn:96.4,ca:4.31,p:0.16,price_tk:65,deleted:false},
+  {id:118,name:"Rice, Grain",name_bn:"চাল (ধান)",nrc_id:"NRC16F123",c:"grain",dm:87.9,ash:1.8,cp:8.1,adf:4.6,ndf:6.4,starch:75.8,ee:2.0,de:3.48,nem:2.004,neg:1.385,tdn:78.9,ca:0.02,p:0.1,price_tk:30,deleted:false},
+  {id:119,name:"Rice Bran",name_bn:"চালের কুঁড়া",nrc_id:"NRC16F118",c:"grain",dm:92.4,ash:10.0,cp:14.8,adf:13.8,ndf:23.1,starch:21.5,ee:18.5,de:3.22,nem:1.855,neg:1.282,tdn:73.0,ca:0.78,p:1.77,price_tk:18,deleted:false},
+  {id:120,name:"Rice Bran, Defatted",name_bn:"চালের কুঁড়া (চর্বিমুক্ত)",nrc_id:"NRC16F119",c:"grain",dm:89.5,ash:12.3,cp:18.5,adf:12.7,ndf:21.5,starch:21.5,ee:3.16,de:2.85,nem:1.642,neg:1.134,tdn:64.6,ca:0.83,p:1.08,price_tk:35,deleted:false},
+  {id:121,name:"Rice Hulls",name_bn:"ধানের তুষ",nrc_id:"NRC16F120",c:"roughage",dm:91.0,ash:17.4,cp:3.7,adf:65.0,ndf:75.1,starch:7.6,ee:1.27,de:1.17,nem:0.674,neg:0.466,tdn:26.5,ca:0.24,p:0.12,price_tk:3,deleted:false},
+  {id:122,name:"Rice Silage, Headed",name_bn:"ধান সাইলেজ (শীষসহ)",nrc_id:"NRC16F121",c:"roughage",dm:41.1,ash:12.5,cp:7.1,adf:31.8,ndf:41.9,starch:32.2,ee:2.86,de:2.49,nem:1.434,neg:0.991,tdn:56.5,ca:0.21,p:0.23,price_tk:5,deleted:false},
+  {id:123,name:"Rice Silage, Vegetative",name_bn:"ধান সাইলেজ (কচি)",nrc_id:"NRC16F122",c:"roughage",dm:42.9,ash:16.2,cp:8.3,adf:43.6,ndf:61.5,starch:7.6,ee:2.59,de:2.18,nem:1.256,neg:0.868,tdn:49.4,ca:0.25,p:0.25,price_tk:5,deleted:false},
+  {id:124,name:"Rye Annual Fresh, Immature",name_bn:"রাই ঘাস তাজা (কচি)",nrc_id:"NRC16F124",c:"roughage",dm:15.8,ash:10.9,cp:27.5,adf:24.8,ndf:42.9,starch:4.9,ee:5.03,de:2.94,nem:1.693,neg:1.17,tdn:66.7,ca:0.48,p:0.49,price_tk:5,deleted:false},
+  {id:125,name:"Rye Annual Fresh, Mid-Maturity",name_bn:"রাই ঘাস তাজা (মধ্য)",nrc_id:"NRC16F125",c:"roughage",dm:19.5,ash:9.7,cp:20.5,adf:28.2,ndf:49.1,starch:4.9,ee:4.37,de:2.78,nem:1.601,neg:1.106,tdn:63.1,ca:0.51,p:0.39,price_tk:5,deleted:false},
+  {id:126,name:"Rye Annual Hay, Immature",name_bn:"রাই হে (কচি)",nrc_id:"NRC16F126",c:"roughage",dm:90.0,ash:9.9,cp:22.9,adf:27.2,ndf:47.0,starch:2.0,ee:3.37,de:2.8,nem:1.613,neg:1.114,tdn:63.5,ca:0.59,p:0.4,price_tk:5,deleted:false},
+  {id:127,name:"Rye Annual Hay, Mature",name_bn:"রাই হে (পরিপক্ক)",nrc_id:"NRC16F127",c:"roughage",dm:92.7,ash:6.3,cp:7.6,adf:42.7,ndf:66.8,starch:2.0,ee:1.77,de:2.36,nem:1.359,neg:0.939,tdn:53.5,ca:0.27,p:0.18,price_tk:5,deleted:false},
+  {id:128,name:"Rye Annual Hay, Mid-Maturity",name_bn:"রাই হে (মধ্য)",nrc_id:"NRC16F131",c:"roughage",dm:90.3,ash:9.3,cp:12.0,adf:36.7,ndf:59.8,starch:2.2,ee:2.89,de:2.5,nem:1.44,neg:0.995,tdn:56.7,ca:0.51,p:0.2,price_tk:5,deleted:false},
+  {id:129,name:"Rye Annual Silage, Immature",name_bn:"রাই সাইলেজ (কচি)",nrc_id:"NRC16F128",c:"roughage",dm:34.7,ash:11.0,cp:16.4,adf:33.1,ndf:55.7,starch:3.3,ee:1.95,de:2.64,nem:1.521,neg:1.051,tdn:59.9,ca:0.42,p:0.46,price_tk:5,deleted:false},
+  {id:130,name:"Rye Annual Silage, Mature",name_bn:"রাই সাইলেজ (পরিপক্ক)",nrc_id:"NRC16F129",c:"roughage",dm:67.2,ash:8.3,cp:8.3,adf:42.9,ndf:66.2,starch:1.7,ee:2.2,de:2.32,nem:1.336,neg:0.923,tdn:52.6,ca:0.36,p:0.25,price_tk:5,deleted:false},
+  {id:131,name:"Rye Annual Silage, Mid-Maturity",name_bn:"রাই সাইলেজ (মধ্য)",nrc_id:"NRC16F130",c:"roughage",dm:34.9,ash:10.3,cp:14.4,adf:38.3,ndf:58.0,starch:1.5,ee:3.88,de:2.48,nem:1.428,neg:0.987,tdn:56.2,ca:0.48,p:0.29,price_tk:5,deleted:false},
+  {id:132,name:"Rye Grain",name_bn:"রাই দানা",nrc_id:"NRC16F132",c:"grain",dm:86.0,ash:2.6,cp:11.8,adf:5.4,ndf:16.9,starch:57.6,ee:2.15,de:3.41,nem:1.964,neg:1.357,tdn:77.3,ca:0.25,p:0.38,price_tk:35,deleted:false},
+  {id:133,name:"Safflower Meal",name_bn:"কুসুম মিল",nrc_id:"NRC16F133",c:"protein",dm:94.0,ash:4.9,cp:26.2,adf:40.1,ndf:55.4,starch:1.2,ee:5.35,de:2.51,nem:1.446,neg:0.999,tdn:56.9,ca:0.3,p:0.71,price_tk:45,deleted:false},
+  {id:134,name:"Sorghum Forage, Silage, Immature",name_bn:"জোয়ার সাইলেজ (কচি)",nrc_id:"NRC16F135",c:"roughage",dm:29.2,ash:11.7,cp:11.7,adf:36.4,ndf:56.7,starch:8.1,ee:3.06,de:2.45,nem:1.411,neg:0.975,tdn:55.6,ca:0.25,p:0.25,price_tk:5,deleted:false},
+  {id:135,name:"Sorghum Forage, Silage, Mature",name_bn:"জোয়ার সাইলেজ (পরিপক্ক)",nrc_id:"NRC16F136",c:"roughage",dm:28.7,ash:8.3,cp:11.3,adf:39.2,ndf:61.6,starch:2.7,ee:3.07,de:2.38,nem:1.371,neg:0.947,tdn:54.0,ca:0.49,p:0.29,price_tk:5,deleted:false},
+  {id:136,name:"Sorghum Grain, Ground",name_bn:"জোয়ার দানা (গুঁড়া)",nrc_id:"NRC16F137",c:"grain",dm:88.9,ash:2.0,cp:12.5,adf:3.9,ndf:6.1,starch:72.6,ee:4.09,de:3.29,nem:1.895,neg:1.309,tdn:74.6,ca:0.1,p:0.38,price_tk:35,deleted:false},
+  {id:137,name:"Sorghum Grain, Steam-Flaked",name_bn:"জোয়ার দানা (স্টিম ফ্লেক)",nrc_id:"NRC16F1073",c:"grain",dm:88.9,ash:2.0,cp:12.5,adf:3.9,ndf:6.1,starch:72.6,ee:4.09,de:3.62,nem:2.085,neg:1.441,tdn:82.1,ca:0.1,p:0.38,price_tk:35,deleted:false},
+  {id:138,name:"Sorghum Hay",name_bn:"জোয়ার হে",nrc_id:"NRC16F138",c:"roughage",dm:91.4,ash:8.5,cp:11.3,adf:38.8,ndf:61.4,starch:3.2,ee:2.18,de:2.39,nem:1.377,neg:0.951,tdn:54.2,ca:0.39,p:0.22,price_tk:5,deleted:false},
+  {id:139,name:"Sorghum Soybean Silage",name_bn:"জোয়ার-সয়াবিন সাইলেজ",nrc_id:"NRC16F139",c:"roughage",dm:32.3,ash:9.2,cp:11.7,adf:35.2,ndf:54.4,starch:9.9,ee:3.19,de:2.48,nem:1.428,neg:0.987,tdn:56.2,ca:0.62,p:0.28,price_tk:5,deleted:false},
+  {id:140,name:"Sorghum-Sudangrass Hay",name_bn:"জোয়ার-সুদান হে",nrc_id:"NRC16F142",c:"roughage",dm:90.5,ash:10.0,cp:9.8,adf:39.3,ndf:61.0,starch:4.9,ee:1.93,de:2.34,nem:1.348,neg:0.931,tdn:53.1,ca:0.37,p:0.24,price_tk:5,deleted:false},
+  {id:141,name:"Sorghum-Sudangrass Silage",name_bn:"জোয়ার-সুদান সাইলেজ",nrc_id:"NRC16F140",c:"roughage",dm:31.7,ash:10.9,cp:12.3,adf:38.9,ndf:59.5,starch:5.6,ee:3.01,de:2.31,nem:1.331,neg:0.919,tdn:52.4,ca:0.45,p:0.3,price_tk:5,deleted:false},
+  {id:142,name:"Soybean Hay",name_bn:"সয়াবিন হে",nrc_id:"NRC16F143",c:"roughage",dm:91.6,ash:9.0,cp:20.1,adf:31.3,ndf:40.3,starch:2.5,ee:3.36,de:2.68,nem:1.544,neg:1.067,tdn:60.8,ca:1.41,p:0.28,price_tk:5,deleted:false},
+  {id:143,name:"Soybean Hulls",name_bn:"সয়াবিনের খোসা",nrc_id:"NRC16F144",c:"roughage",dm:90.4,ash:5.2,cp:12.3,adf:47.9,ndf:66.7,starch:1.0,ee:1.89,de:2.7,nem:1.555,neg:1.075,tdn:61.2,ca:0.64,p:0.13,price_tk:5,deleted:false},
+  {id:144,name:"Soybean Meal, Expellers",name_bn:"সয়াবিন মিল (এক্সপেলার)",nrc_id:"NRC16F145",c:"protein",dm:91.2,ash:6.7,cp:47.6,adf:10.9,ndf:19.6,starch:1.8,ee:7.12,de:3.9,nem:2.246,neg:1.552,tdn:88.5,ca:0.34,p:0.72,price_tk:52,deleted:false},
+  {id:145,name:"Soybean Meal, Extruded",name_bn:"সয়াবিন মিল (এক্সট্রুডেড)",nrc_id:"NRC16F146",c:"protein",dm:93.4,ash:5.7,cp:40.4,adf:10.6,ndf:18.4,starch:1.5,ee:20.42,de:4.16,nem:2.396,neg:1.656,tdn:94.4,ca:0.27,p:0.63,price_tk:45,deleted:false},
+  {id:146,name:"Soybean Meal, Solvent Extracted 48% CP",name_bn:"সয়াবিন মিল (সলভেন্ট, ৪৮% CP)",nrc_id:"NRC16F134",c:"protein",dm:89.3,ash:7.2,cp:52.6,adf:7.2,ndf:11.1,starch:1.9,ee:1.82,de:3.99,nem:2.298,neg:1.588,tdn:90.5,ca:0.4,p:0.74,price_tk:55,deleted:false},
+  {id:147,name:"Soybean Silage",name_bn:"সয়াবিন সাইলেজ",nrc_id:"NRC16F147",c:"roughage",dm:37.5,ash:10.1,cp:18.0,adf:35.6,ndf:45.3,starch:4.3,ee:2.86,de:2.56,nem:1.475,neg:1.019,tdn:58.1,ca:1.33,p:0.32,price_tk:5,deleted:false},
+  {id:148,name:"Soybeans, Whole Raw",name_bn:"সয়াবিন (পূর্ণ, কাঁচা)",nrc_id:"NRC16F148",c:"grain",dm:89.1,ash:5.3,cp:40.0,adf:7.0,ndf:14.2,starch:43.0,ee:20.73,de:4.33,nem:2.494,neg:1.723,tdn:98.2,ca:0.27,p:0.67,price_tk:35,deleted:false},
+  {id:149,name:"Soybeans, Whole Roasted",name_bn:"সয়াবিন (পূর্ণ, ভাজা)",nrc_id:"NRC16F149",c:"grain",dm:94.0,ash:5.6,cp:40.0,adf:10.1,ndf:18.4,starch:1.5,ee:21.26,de:4.16,nem:2.396,neg:1.656,tdn:94.4,ca:0.28,p:0.63,price_tk:35,deleted:false},
+  {id:150,name:"Spelt Grain",name_bn:"স্পেল্ট দানা",nrc_id:"NRC16F150",c:"grain",dm:87.4,ash:2.7,cp:12.9,adf:21.3,ndf:39.3,starch:41.3,ee:2.44,de:3.0,nem:1.728,neg:1.194,tdn:68.0,ca:0.09,p:0.38,price_tk:35,deleted:false},
+  {id:151,name:"Sudangrass Hay, Mature",name_bn:"সুদান ঘাস হে (পরিপক্ক)",nrc_id:"NRC16F151",c:"roughage",dm:93.1,ash:9.6,cp:8.1,adf:41.6,ndf:65.8,starch:1.5,ee:1.69,de:2.29,nem:1.319,neg:0.911,tdn:51.9,ca:0.45,p:0.21,price_tk:5,deleted:false},
+  {id:152,name:"Sudangrass Hay, Mid-Maturity",name_bn:"সুদান ঘাস হে (মধ্য)",nrc_id:"NRC16F152",c:"roughage",dm:83.1,ash:15.0,cp:14.7,adf:36.9,ndf:54.6,starch:2.0,ee:2.58,de:2.18,nem:1.256,neg:0.868,tdn:49.4,ca:1.25,p:0.12,price_tk:5,deleted:false},
+  {id:153,name:"Sudangrass Silage, Mature",name_bn:"সুদান ঘাস সাইলেজ (পরিপক্ক)",nrc_id:"NRC16F153",c:"roughage",dm:31.5,ash:10.6,cp:9.5,adf:43.8,ndf:60.7,starch:2.1,ee:2.69,de:2.16,nem:1.244,neg:0.86,tdn:49.0,ca:0.45,p:0.25,price_tk:5,deleted:false},
+  {id:154,name:"Sudangrass Silage, Mid-Maturity",name_bn:"সুদান ঘাস সাইলেজ (মধ্য)",nrc_id:"NRC16F154",c:"roughage",dm:31.5,ash:12.3,cp:13.4,adf:39.0,ndf:60.7,starch:1.8,ee:3.24,de:2.27,nem:1.308,neg:0.903,tdn:51.5,ca:0.52,p:0.32,price_tk:5,deleted:false},
+  {id:155,name:"Sugarcane Bagasse Hay",name_bn:"আখের ছোবড়া হে",nrc_id:"NRC16F155",c:"roughage",dm:93.2,ash:6.1,cp:3.9,adf:62.6,ndf:76.9,starch:0.8,ee:1.26,de:1.55,nem:0.893,neg:0.617,tdn:35.2,ca:0.34,p:0.05,price_tk:6,deleted:false},
+  {id:156,name:"Sugarcane Bagasse Silage",name_bn:"আখের ছোবড়া সাইলেজ",nrc_id:"NRC16F156",c:"roughage",dm:34.6,ash:6.2,cp:2.5,adf:55.0,ndf:72.0,starch:1.0,ee:1.6,de:1.83,nem:1.054,neg:0.728,tdn:41.5,ca:0.25,p:0.07,price_tk:5,deleted:false},
+  {id:157,name:"Sunflower Meal",name_bn:"সূর্যমুখী মিল",nrc_id:"NRC16F157",c:"protein",dm:90.2,ash:7.4,cp:37.0,adf:29.0,ndf:40.2,starch:1.1,ee:2.2,de:2.99,nem:1.722,neg:1.19,tdn:67.8,ca:0.46,p:1.13,price_tk:45,deleted:false},
+  {id:158,name:"Sunflower Seed",name_bn:"সূর্যমুখী বীজ",nrc_id:"NRC16F158",c:"grain",dm:92.7,ash:3.5,cp:20.1,adf:24.4,ndf:35.2,starch:0.6,ee:39.0,de:4.16,nem:2.396,neg:1.656,tdn:94.4,ca:0.2,p:0.73,price_tk:35,deleted:false},
+  {id:159,name:"Sunflower Silage",name_bn:"সূর্যমুখী সাইলেজ",nrc_id:"NRC16F159",c:"roughage",dm:21.6,ash:12.6,cp:13.3,adf:36.6,ndf:45.3,starch:1.5,ee:5.39,de:2.42,nem:1.394,neg:0.963,tdn:54.9,ca:1.12,p:0.38,price_tk:5,deleted:false},
+  {id:160,name:"Sweet Corn Cannery Waste",name_bn:"মিষ্টি ভুট্টা উপজাত",nrc_id:"NRC16F160",c:"byproduct",dm:22.5,ash:5.1,cp:9.8,adf:32.0,ndf:56.3,starch:48.0,ee:5.08,de:3.27,nem:1.884,neg:1.301,tdn:74.2,ca:0.24,p:0.27,price_tk:20,deleted:false},
+  {id:161,name:"Tapioca (Cassava)",name_bn:"ট্যাপিওকা/কাসাভা",nrc_id:"NRC16F161",c:"byproduct",dm:87.7,ash:3.2,cp:2.5,adf:8.1,ndf:11.0,starch:78.9,ee:0.7,de:3.98,nem:2.292,neg:1.584,tdn:90.3,ca:0.09,p:0.09,price_tk:30,deleted:false},
+  {id:162,name:"Tomato Pomace",name_bn:"টমেটো পোমাস",nrc_id:"NRC16F162",c:"byproduct",dm:24.7,ash:5.5,cp:19.3,adf:47.6,ndf:60.0,starch:1.2,ee:13.3,de:2.63,nem:1.515,neg:1.047,tdn:59.7,ca:0.22,p:0.47,price_tk:20,deleted:false},
+  {id:163,name:"Triticale Grain",name_bn:"ট্রিটিকেল দানা",nrc_id:"NRC16F163",c:"grain",dm:88.4,ash:2.1,cp:12.1,adf:4.4,ndf:14.1,starch:62.2,ee:1.73,de:3.44,nem:1.981,neg:1.369,tdn:78.0,ca:0.09,p:0.49,price_tk:35,deleted:false},
+  {id:164,name:"Triticale Hay",name_bn:"ট্রিটিকেল হে",nrc_id:"NRC16F164",c:"roughage",dm:91.0,ash:8.5,cp:10.3,adf:38.3,ndf:60.0,starch:4.8,ee:2.29,de:2.5,nem:1.44,neg:0.995,tdn:56.7,ca:0.33,p:0.49,price_tk:5,deleted:false},
+  {id:165,name:"Triticale Plus Pea Silage",name_bn:"ট্রিটিকেল-মটর সাইলেজ",nrc_id:"NRC16F165",c:"roughage",dm:34.2,ash:10.3,cp:16.0,adf:37.1,ndf:55.7,starch:3.1,ee:3.76,de:2.5,nem:1.44,neg:0.995,tdn:56.7,ca:0.68,p:0.51,price_tk:5,deleted:false},
+  {id:166,name:"Triticale Silage, Mature",name_bn:"ট্রিটিকেল সাইলেজ (পরিপক্ক)",nrc_id:"NRC16F166",c:"roughage",dm:30.1,ash:10.1,cp:14.2,adf:37.2,ndf:58.6,starch:2.5,ee:3.47,de:2.35,nem:1.354,neg:0.935,tdn:53.3,ca:0.38,p:0.16,price_tk:5,deleted:false},
+  {id:167,name:"Triticale Silage, Mid-Maturity",name_bn:"ট্রিটিকেল সাইলেজ (মধ্য)",nrc_id:"NRC16F167",c:"roughage",dm:33.3,ash:12.4,cp:17.8,adf:34.8,ndf:52.2,starch:1.5,ee:4.08,de:2.56,nem:1.475,neg:1.019,tdn:58.1,ca:0.52,p:0.41,price_tk:5,deleted:false},
+  {id:168,name:"Wheat Bran",name_bn:"গমের ভুষি",nrc_id:"NRC16F169",c:"grain",dm:90.1,ash:5.5,cp:17.4,adf:13.8,ndf:40.1,starch:20.8,ee:4.39,de:3.06,nem:1.763,neg:1.218,tdn:69.4,ca:0.13,p:1.05,price_tk:28,deleted:false},
+  {id:169,name:"Wheat Grain, Ground",name_bn:"গম দানা (গুঁড়া)",nrc_id:"NRC16F170",c:"grain",dm:85.7,ash:2.1,cp:13.5,adf:4.2,ndf:12.5,starch:63.0,ee:1.98,de:3.56,nem:2.051,neg:1.417,tdn:80.7,ca:0.1,p:0.45,price_tk:35,deleted:false},
+  {id:170,name:"Wheat Hay, Headed",name_bn:"গম হে (শীষসহ)",nrc_id:"NRC16F171",c:"roughage",dm:90.6,ash:8.1,cp:9.9,adf:33.6,ndf:52.8,starch:12.2,ee:2.09,de:2.52,nem:1.452,neg:1.003,tdn:57.2,ca:0.31,p:0.23,price_tk:5,deleted:false},
+  {id:171,name:"Wheat Hay, Vegetative",name_bn:"গম হে (কচি)",nrc_id:"NRC16F172",c:"roughage",dm:90.5,ash:10.5,cp:10.5,adf:36.1,ndf:59.9,starch:3.4,ee:2.19,de:2.48,nem:1.428,neg:0.987,tdn:56.2,ca:0.29,p:0.2,price_tk:5,deleted:false},
+  {id:172,name:"Wheat Middlings",name_bn:"গমের মিডলিং",nrc_id:"NRC16F173",c:"grain",dm:88.3,ash:5.9,cp:19.1,adf:13.2,ndf:38.7,starch:22.9,ee:4.35,de:3.07,nem:1.768,neg:1.222,tdn:69.6,ca:0.14,p:1.21,price_tk:35,deleted:false},
+  {id:173,name:"Wheat Silage, Headed",name_bn:"গম সাইলেজ (শীষসহ)",nrc_id:"NRC16F174",c:"roughage",dm:34.8,ash:10.5,cp:10.7,adf:35.1,ndf:51.4,starch:13.0,ee:3.06,de:2.51,nem:1.446,neg:0.999,tdn:56.9,ca:0.3,p:0.3,price_tk:5,deleted:false},
+  {id:174,name:"Wheat Silage, Vegetative",name_bn:"গম সাইলেজ (কচি)",nrc_id:"NRC16F175",c:"roughage",dm:35.6,ash:9.9,cp:13.4,adf:37.0,ndf:56.6,starch:2.5,ee:3.5,de:2.53,nem:1.457,neg:1.007,tdn:57.4,ca:0.43,p:0.49,price_tk:5,deleted:false},
+  {id:175,name:"Wheat Straw",name_bn:"গমের খড়",nrc_id:"NRC16F176",c:"roughage",dm:89.5,ash:8.0,cp:4.5,adf:53.1,ndf:76.9,starch:2.5,ee:1.49,de:1.96,nem:1.129,neg:0.78,tdn:44.5,ca:0.38,p:0.12,price_tk:8,deleted:false},
+  {id:176,name:"Whey, Dry",name_bn:"হোয়ে (শুকনো)",nrc_id:"NRC16F177",c:"byproduct",dm:92.6,ash:9.7,cp:17.8,adf:0.3,ndf:0.6,starch:56.1,ee:6.27,de:3.62,nem:2.085,neg:1.441,tdn:82.1,ca:0.92,p:0.89,price_tk:20,deleted:false},
+  {id:177,name:"Whey, Wet",name_bn:"হোয়ে (ভেজা)",nrc_id:"NRC16F178",c:"byproduct",dm:22.9,ash:13.5,cp:7.4,adf:2.2,ndf:2.2,starch:50.6,ee:1.97,de:3.16,nem:1.82,neg:1.258,tdn:71.7,ca:1.26,p:1.29,price_tk:20,deleted:false},
+  {id:178,name:"Urea",name_bn:"ইউরিয়া (NPN)",nrc_id:"NRC16F168",c:"supplement",dm:99.0,ash:0.0,cp:281.0,adf:0.0,ndf:0.0,starch:0.0,ee:0.0,de:2.21,nem:1.273,neg:0.88,tdn:50.1,ca:0.0,p:0.0,price_tk:50,deleted:false}
 ];
 
 // Default prices (Tk/kg as-fed) for Bangladesh common feeds
-const DEFAULT_PRICES = {20:3,21:3,22:3,23:2,24:2,25:2,26:1,27:1,89:2,90:0,91:0,92:2,
-  30:38,31:30,32:35,33:28,34:30,35:50,47:32,49:38,50:40,64:12,65:14,66:18,67:22,
-  80:25,81:28,82:35,83:120,84:60,85:18,86:15,87:35,88:20};
-let feedDB = FEEDS.map(f => ({...f, deleted:false, price_tk: DEFAULT_PRICES[f.id]||0}));
+const DEFAULT_PRICES = {1:45, 2:5, 3:20, 4:20, 5:20, 6:20, 7:45, 8:35, 9:5, 10:5, 11:20, 12:20, 13:20, 14:5, 15:5, 16:5, 17:70, 18:45, 19:35, 20:35, 21:45, 22:45, 23:80, 24:20, 25:20, 26:45, 27:35, 28:20, 29:20, 30:20, 31:5, 32:5, 33:5, 34:35, 35:35, 36:5, 37:5, 38:35, 39:45, 40:35, 41:35, 42:45, 43:38, 44:38, 45:38, 46:35, 47:35, 48:35, 49:35, 50:35, 51:5, 52:5, 53:6, 54:5, 55:35, 56:5, 57:5, 58:40, 59:35, 60:35, 61:35, 62:35, 63:35, 64:35, 65:45, 66:80, 67:130, 68:80, 69:80, 70:80, 71:80, 72:120, 73:80, 74:90, 75:45, 76:80, 77:35, 78:45, 79:20, 80:80, 81:35, 82:5, 83:5, 84:5, 85:5, 86:5, 87:5, 88:5, 89:5, 90:5, 91:5, 92:5, 93:5, 94:5, 95:5, 96:5, 97:5, 98:45, 99:5, 100:5, 101:22, 102:35, 103:5, 104:5, 105:5, 106:5, 107:5, 108:5, 109:5, 110:5, 111:45, 112:35, 113:35, 114:35, 115:20, 116:45, 117:65, 118:30, 119:18, 120:35, 121:3, 122:5, 123:5, 124:5, 125:5, 126:5, 127:5, 128:5, 129:5, 130:5, 131:5, 132:35, 133:45, 134:5, 135:5, 136:35, 137:35, 138:5, 139:5, 140:5, 141:5, 142:5, 143:5, 144:52, 145:45, 146:55, 147:5, 148:35, 149:35, 150:35, 151:5, 152:5, 153:5, 154:5, 155:6, 156:5, 157:45, 158:35, 159:5, 160:20, 161:30, 162:20, 163:35, 164:5, 165:5, 166:5, 167:5, 168:28, 169:35, 170:5, 171:5, 172:35, 173:5, 174:5, 175:8, 176:20, 177:20, 178:50};
+let feedDB = FEEDS.map(f => ({
+  ...f,
+  n: f.name,          // render functions use f.n for English name
+  b: f.name_bn || f.name,  // render functions use f.b for Bengali name
+  deleted: false,
+  price_tk: DEFAULT_PRICES[f.id] || 0
+}));
 let nextFeedId = Math.max(...FEEDS.map(f=>f.id)) + 1;
 
 // ════════════════════════════════════════
@@ -924,10 +1030,15 @@ function calculate() {
   const MP_total= MP_maint + MP_gain + MP_lac + MP_gest;
   const CP_approx= MP_total * 1.18;
 
-  // DMI
-  let DMI = 4.54 + 0.0125*SBW;
-  if(diet==='forage') DMI*=1.10; else if(diet==='conc') DMI*=0.90;
-  if(phase==='maintenance') DMI=BW*0.022;
+  // ── DMI (NRC 2021 Eq 2-1)
+  // SBW^0.75 × (0.1188 − 0.01395 × ln(NEma_d))
+  // NEma_d: forage diet=1.25, mixed=1.50, concentrate=1.80 Mcal/kg DM
+  const NEma_d_val = diet==='forage' ? 1.25 : diet==='conc' ? 1.80 : 1.50;
+  const NEga_d_val = diet==='forage' ? 0.70 : diet==='conc' ? 1.15 : 0.92;
+  let DMI = SBW75 * (0.1188 - 0.01395 * Math.log(NEma_d_val));
+  DMI = DMI / ionop;
+  if(temp < 15) DMI *= (1 + (15 - temp) * 0.007);
+  if(phase==='maintenance') DMI = BW * 0.018;
 
   // Ca & P
   const Ca_maint= 0.0154*BW;
@@ -950,13 +1061,18 @@ function calculate() {
   const NEma_d = diet==='forage'?1.25 : diet==='mixed'?1.50 : 1.80;
   const NEga_d = diet==='forage'?0.70 : diet==='mixed'?0.92 : 1.15;
 
+  // Required NE densities (Mcal/kg DM) = requirement / DMI
+  const NEm_dens_req = DMI > 0 ? NEmFinal / DMI : 0;
+  const NEg_dens_req = DMI > 0 ? NEg      / DMI : 0;
+
   REQ = {BW,ADG,FSBW,BE,sex,frame,phase,diet,isLac,isGest,milkY,
     SBW,SBW75,EBW,EQSBW,MW,
     NEmBase,NEmAdj,NEmAct,coldAdd,NEmFinal,actF,ionop,
     NEg,NEl,NEpreg,NE_total,
     MP_maint,MP_gain,NP_gain,MP_lac,MP_gest,MP_total,CP_approx,
     DMI,Ca_req,P_req,Mg_req,Na_req,K_pct,VitA,water,
-    NEma_d,NEga_d,temp,housing,gait,terrain};
+    NEma_d:NEma_d_val,NEga_d:NEga_d_val,NEm_dens_req,NEg_dens_req,
+    temp,housing,gait,terrain};
 
   renderResults();
   document.getElementById('results-section').style.display='block';
@@ -974,8 +1090,8 @@ function renderResults() {
     `🐄 <strong>ওজন:</strong> ${R.BW} কেজি &nbsp;|&nbsp; <strong>লিঙ্গ:</strong> ${sexNames[R.sex]} &nbsp;|&nbsp; <strong>ADG:</strong> ${R.ADG} কেজি/দিন &nbsp;|&nbsp; <strong>পর্যায়:</strong> ${phaseNames[R.phase]} &nbsp;|&nbsp; <strong>SBW:</strong> ${R.SBW.toFixed(1)} কেজি`;
 
   document.getElementById('req-metrics').innerHTML =
-    mCard(R.NEmFinal.toFixed(2),'Mcal/day','⚡ NEm চাহিদা (রক্ষণা)','') +
-    mCard(R.NEg.toFixed(2),'Mcal/day','🚀 NEg চাহিদা (বৃদ্ধি)','amber') +
+    mCard(R.NEmFinal.toFixed(2)+'<br><small style="font-size:11px;opacity:.75">ঘনত্ব: '+R.NEm_dens_req.toFixed(3)+' Mcal/kg</small>','Mcal/day','⚡ NEm চাহিদা (রক্ষণা)','') +
+    mCard(R.NEg.toFixed(2)+'<br><small style="font-size:11px;opacity:.75">ঘনত্ব: '+R.NEg_dens_req.toFixed(3)+' Mcal/kg</small>','Mcal/day','🚀 NEg চাহিদা (বৃদ্ধি)','amber') +
     mCard(R.MP_total.toFixed(0),'g/day','🥩 মোট MP চাহিদা','blue') +
     mCard(R.DMI.toFixed(2),'kg/day','🌾 আনুমানিক DMI','purple');
 
@@ -1167,8 +1283,47 @@ function removeFromRation(id){
 function updateAmt(id, val){
   const r=RATION.find(x=>x.feedId===id);
   if(r) r.kg_dm = Math.max(0, parseFloat(val)||0);
+  updateRationTotalsRow();
   updateLiveBars();
   updateRationNutri();
+}
+
+function updateRationTotalsRow(){
+  // Update per-row fresh kg and cost cells, and the totals row — without re-rendering inputs
+  const nutri=calcRationNutri();
+  let totalCost=0;
+  RATION.forEach(r=>{
+    const f=feedDB.find(x=>x.id===r.feedId);
+    if(!f) return;
+    const freshKg = f.dm>0 ? r.kg_dm/(f.dm/100) : 0;
+    const price = r.price_tk !== undefined ? r.price_tk : (f.price_tk||0);
+    const cost = freshKg * price;
+    totalCost += cost;
+  });
+  // Update totals row (last <tr> in tbody with bold style)
+  const tbl = document.querySelector('#ration-table-inner table tbody');
+  if(!tbl) return;
+  const rows = tbl.querySelectorAll('tr');
+  const totRow = rows[rows.length-1];
+  if(totRow){
+    const cells = totRow.querySelectorAll('td');
+    if(cells.length>=10){
+      cells[1].textContent = nutri.dmi.toFixed(2) + ' কেজি DM';
+      cells[2].textContent = nutri.freshTotal.toFixed(2) + ' কেজি';
+      cells[4].textContent = '৳'+totalCost.toFixed(1)+'/দিন';
+      cells[5].textContent = nutri.nem_density.toFixed(3)+' Mcal/kg';
+      cells[6].textContent = nutri.neg_density.toFixed(3)+' Mcal/kg';
+      cells[7].textContent = nutri.cp.toFixed(0)+'g';
+      cells[8].textContent = nutri.ca.toFixed(1)+'g';
+      cells[9].textContent = nutri.p.toFixed(1)+'g';
+    }
+  }
+  // Also update footer info
+  const perMonth = totalCost*30;
+  const footerEl = document.getElementById('ration-total-info');
+  if(footerEl) footerEl.innerHTML =
+    `মোট DM: <strong>${nutri.dmi.toFixed(2)} কেজি</strong> | তাজা: <strong>${nutri.freshTotal.toFixed(1)} কেজি</strong> | 
+    খরচ: <strong style="color:var(--g1)">৳${totalCost.toFixed(0)}/দিন</strong> | <strong>৳${perMonth.toFixed(0)}/মাস</strong>`;
 }
 
 function updatePrice(id, val){
@@ -1258,21 +1413,33 @@ function renderRation(){
 }
 
 function calcRationNutri(){
-  let dmi=0,tdn=0,nem=0,neg=0,cp=0,ca=0,p=0,ndf=0,ee=0,mp=0,freshTotal=0,totalCost=0;
+  let dmi=0,tdn=0,nem=0,neg=0,cp=0,ca=0,p=0,ndf=0,ee=0,freshTotal=0,totalCost=0;
   RATION.forEach(r=>{
     const f=feedDB.find(x=>x.id===r.feedId);
     if(!f) return;
     const kg=r.kg_dm;
     const freshKg = f.dm>0 ? kg/(f.dm/100) : 0;
     const price = r.price_tk !== undefined ? r.price_tk : (f.price_tk||0);
-    dmi+=kg; tdn+=f.tdn*kg/100; nem+=f.nem*kg; neg+=f.neg*kg;
-    cp+=f.cp*kg*10; ca+=f.ca*kg*10; p+=f.p*kg*10;
-    ndf+=f.ndf*kg/100; ee+=f.ee*kg/100;
-    mp+=cp*0.85;
-    freshTotal+=freshKg;
-    totalCost+=freshKg*price;
+    dmi        += kg;
+    tdn        += f.tdn * kg / 100;
+    nem        += f.nem * kg;
+    neg        += f.neg * kg;
+    cp         += f.cp  * kg * 10;
+    ca         += f.ca  * kg * 10;
+    p          += f.p   * kg * 10;
+    ndf        += f.ndf * kg / 100;
+    ee         += f.ee  * kg / 100;
+    freshTotal += freshKg;
+    totalCost  += freshKg * price;
   });
-  return {dmi,tdn,nem,neg,cp,ca,p,ndf,ee,mp,freshTotal,totalCost};
+  // ── Derived metrics ──
+  // MP (সরলীকৃত): CP × 0.64 — loop শেষে একবার
+  const mp = cp * 0.64;
+  // Diet NE densities (Mcal/kg DM) — ration evaluation-এর মূল ভিত্তি
+  const nem_density = dmi > 0 ? nem / dmi : 0;  // Mcal NEm / kg DM
+  const neg_density = dmi > 0 ? neg / dmi : 0;  // Mcal NEg / kg DM
+  const cp_pct      = dmi > 0 ? (cp / (dmi*1000)) * 100 : 0; // CP% of DM
+  return {dmi,tdn,nem,neg,cp,ca,p,ndf,ee,mp,freshTotal,totalCost,nem_density,neg_density,cp_pct};
 }
 
 function setPB(id, pct, val, unit){
@@ -1296,78 +1463,202 @@ function resetLiveBars(){
 function updateLiveBars(){
   if(!REQ){resetLiveBars();return;}
   const R=REQ, n=calcRationNutri();
-  setPB('nem', n.nem/R.NEmFinal*100, n.nem.toFixed(2), 'Mcal');
-  setPB('neg', R.NEg>0?n.neg/R.NEg*100:0, n.neg.toFixed(2), 'Mcal');
-  setPB('mp',  n.mp/R.MP_total*100, n.mp.toFixed(0), 'g');
-  setPB('dmi', n.dmi/R.DMI*100, n.dmi.toFixed(2), 'কেজি');
-  setPB('ca',  n.ca/R.Ca_req*100, n.ca.toFixed(1), 'g');
-  setPB('p',   n.p/R.P_req*100, n.p.toFixed(1), 'g');
 
-  // Live mini summary
-  function status(pct){return pct>=100&&pct<=120?'✅':pct>=85?'🟡':pct>120?'🔵':'🔴'}
-  const nemP=Math.round(n.nem/R.NEmFinal*100), negP=REQ.NEg>0?Math.round(n.neg/R.NEg*100):100;
-  const mpP=Math.round(n.mp/R.MP_total*100), dmiP=Math.round(n.dmi/R.DMI*100);
+  // ── NRC 2000 সঠিক পদ্ধতি:
+  // NEm ও NEg: diet density (Mcal/kg DM) তুলনা করা হয় required density-এর সাথে
+  // Required density = requirement(Mcal/day) / DMI(kg/day)
+  const nemDP = R.NEm_dens_req>0 ? n.nem_density/R.NEm_dens_req*100 : 0;
+  const negDP = R.NEg_dens_req>0 ? n.neg_density/R.NEg_dens_req*100 : 100;
+  const cpP   = R.CP_approx>0    ? n.cp/R.CP_approx*100              : 0;
+  const dmiP  = R.DMI>0          ? n.dmi/R.DMI*100                   : 0;
+  const caP   = R.Ca_req>0       ? n.ca/R.Ca_req*100                 : 0;
+  const pP    = R.P_req>0        ? n.p/R.P_req*100                   : 0;
+
+  setPB('nem', nemDP, n.nem_density.toFixed(3)+' Mcal/kg DM', '');
+  setPB('neg', negDP, n.neg_density.toFixed(3)+' Mcal/kg DM', '');
+  setPB('mp',  cpP,   n.cp.toFixed(0)+'g CP', '');
+  setPB('dmi', dmiP,  n.dmi.toFixed(2), 'কেজি');
+  setPB('ca',  caP,   n.ca.toFixed(1), 'g');
+  setPB('p',   pP,    n.p.toFixed(1), 'g');
+
+  function status(pct){return pct>=95&&pct<=120?'✅':pct>=80?'🟡':pct>120?'🔵':'🔴'}
   document.getElementById('live-summary').innerHTML=`
     <div style="background:var(--g6);border-radius:var(--rs);padding:8px 10px;text-align:center;font-size:12px">
-      ${status(nemP)} NEm<br><strong>${nemP}%</strong>
+      ${status(nemDP)} NEm ঘনত্ব<br><strong>${Math.round(nemDP)}%</strong>
     </div>
     <div style="background:var(--al);border-radius:var(--rs);padding:8px 10px;text-align:center;font-size:12px">
-      ${status(negP)} NEg<br><strong>${negP}%</strong>
+      ${status(negDP)} NEg ঘনত্ব<br><strong>${Math.round(negDP)}%</strong>
     </div>
     <div style="background:var(--bl);border-radius:var(--rs);padding:8px 10px;text-align:center;font-size:12px">
-      ${status(mpP)} MP<br><strong>${mpP}%</strong>
+      ${status(cpP)} CP<br><strong>${Math.round(cpP)}%</strong>
     </div>
     <div style="background:var(--pl);border-radius:var(--rs);padding:8px 10px;text-align:center;font-size:12px">
-      ${status(dmiP)} DMI<br><strong>${dmiP}%</strong>
+      ${status(dmiP)} DMI<br><strong>${Math.round(dmiP)}%</strong>
     </div>`;
 }
 
 function updateRationNutri(){
   if(!REQ||RATION.length===0){document.getElementById('ration-nutri-card').style.display='none';return;}
   const R=REQ, n=calcRationNutri();
-  const card=document.getElementById('ration-nutri-card');
-  card.style.display='block';
+  document.getElementById('ration-nutri-card').style.display='block';
 
-  function st(pct){
-    if(pct>=100&&pct<=120) return '<span class="status-ok">✅ পূরণ হচ্ছে</span>';
-    if(pct>120) return '<span class="status-over">🔵 বেশি সরবরাহ</span>';
-    if(pct>=85) return '<span class="status-warn">⚠️ প্রায় পূরণ</span>';
+  // ═══════════════════════════════════════════════════════════
+  // NRC 2000 সঠিক তুলনা পদ্ধতি:
+  //
+  // ১. NEm ও NEg → diet density (Mcal/kg DM) তুলনা
+  //    Required density = requirement / DMI_predicted
+  //    এটাই একমাত্র সঠিক পদ্ধতি — কারণ diet থেকে NEm ও NEg
+  //    আলাদা pool-এ কাজ করে; total supply vs maintenance alone
+  //    তুলনা করলে সর্বদা >200% দেখাবে (misleading)
+  //
+  // ২. CP → g/day সরাসরি তুলনা (CP_approx)
+  // ৩. Ca, P → g/day তুলনা
+  // ৪. DMI → kg/day তুলনা
+  //
+  // ৫. Predicted ADG → ration-এর NEg density থেকে
+  //    ADG_pred: NEg_supply = 0.0635 × EBW^0.75 × EBG^1.097
+  //    → solve for EBG → ADG_pred = EBG/0.956
+  // ═══════════════════════════════════════════════════════════
+
+  function st(p){
+    if(p>=95&&p<=120) return '<span class="status-ok">✅ পূরণ হচ্ছে</span>';
+    if(p>120)         return '<span class="status-over">🔵 বেশি সরবরাহ</span>';
+    if(p>=80)         return '<span class="status-warn">⚠️ প্রায় পূরণ</span>';
     return '<span class="status-low">❌ ঘাটতি</span>';
   }
-  function pct(a,b){return b>0?Math.round(a/b*100):0}
+  function pp(a,b){return b>0?Math.round(a/b*100):0}
 
-  let warnings='', recs='';
-  const nemPct=pct(n.nem,R.NEmFinal), negPct=R.NEg>0?pct(n.neg,R.NEg):100;
-  const mpPct=pct(n.mp,R.MP_total), caPct=pct(n.ca,R.Ca_req), pPct=pct(n.p,R.P_req);
-  const caPRatio=n.p>0?n.ca/n.p:0;
-  if(nemPct<85) warnings+=`<li>NEm ঘাটতি (${nemPct}%) — আরো শক্তিসমৃদ্ধ খাদ্য যোগ করুন (ভুট্টা, গমের ভুষি)</li>`;
-  if(negPct<85&&R.ADG>0) warnings+=`<li>NEg ঘাটতি (${negPct}%) — বৃদ্ধির জন্য আরো দানাদার প্রয়োজন</li>`;
-  if(mpPct<85) warnings+=`<li>প্রোটিন ঘাটতি (${mpPct}%) — সরিষার খৈল বা সয়াবিন মিল বাড়ান</li>`;
-  if(caPct<85) warnings+=`<li>Ca ঘাটতি — DCP বা খড়চুন যোগ করুন</li>`;
-  if(pPct<85) warnings+=`<li>P ঘাটতি — চালের কুঁড়া বা DCP বাড়ান</li>`;
-  if(caPRatio<1||caPRatio>7) warnings+=`<li>Ca:P অনুপাত অস্বাভাবিক (${caPRatio.toFixed(2)}:১) — স্বাভাবিক: ১:১ থেকে ৭:১</li>`;
-  if(n.dmi/R.DMI>1.15) warnings+=`<li>DMI অনেক বেশি — রেশনের পরিমাণ কমান</li>`;
-  if(!warnings) warnings='<li style="color:var(--g2)">✅ সব পুষ্টি গ্রহণযোগ্য পরিসরে রয়েছে!</li>';
+  // NE density comparison
+  const nemDPct = pp(n.nem_density, R.NEm_dens_req);
+  const negDPct = R.NEg_dens_req>0 ? pp(n.neg_density, R.NEg_dens_req) : 100;
+  const cpPct   = pp(n.cp,  R.CP_approx);
+  const caPct   = pp(n.ca,  R.Ca_req);
+  const pPct    = pp(n.p,   R.P_req);
+  const dmiPct  = pp(n.dmi, R.DMI);
+  const caPRatio= n.p>0 ? n.ca/n.p : 0;
+
+  // Predicted ADG from ration NEg density
+  // NEg_avail/day = n.neg_density × DMI (animal actual intake)
+  // 0.0635 × EBW^0.75 × EBG^1.097 = NEg_avail
+  // EBG = (NEg_avail / (0.0635 × EBW^0.75))^(1/1.097)
+  // ADG_pred = EBG / 0.956
+  let ADG_pred = 0;
+  if(n.neg_density > 0 && n.dmi > 0){
+    const NEg_avail  = n.neg;                        // Mcal/day from ration
+    const NEm_avail  = n.nem;                        // Mcal/day from ration
+    const NEm_maint  = R.NEmFinal;
+    const NEm_surplus= Math.max(0, NEm_avail - NEm_maint); // NEm above maintenance
+    // Use NEg from ration directly (most accurate when feed NEg values used)
+    const coeff = 0.0635 * Math.pow(R.EBW, 0.75);
+    if(coeff > 0 && NEg_avail > 0){
+      const EBG_pred = Math.pow(NEg_avail / coeff, 1/1.097);
+      ADG_pred = EBG_pred / 0.956;
+    }
+  }
+  const adgPct = R.ADG>0 ? pp(ADG_pred, R.ADG) : 0;
+
+  let warnings='';
+  if(nemDPct<80)      warnings+=`<li>NEm ঘনত্ব কম (${nemDPct}%) — ভুট্টা বা গমের ভুষি বাড়ান</li>`;
+  if(negDPct<80&&R.NEg>0) warnings+=`<li>NEg ঘনত্ব কম (${negDPct}%) — দানাদার খাদ্য বাড়ান; ADG লক্ষ্যমাত্রা পূরণ হবে না</li>`;
+  if(cpPct<85)        warnings+=`<li>CP ঘাটতি (${cpPct}%) — সরিষার খৈল বা সয়াবিন মিল বাড়ান</li>`;
+  if(caPct<85)        warnings+=`<li>Ca ঘাটতি — DCP বা চুনাপাথর যোগ করুন</li>`;
+  if(pPct<85)         warnings+=`<li>P ঘাটতি — চালের কুঁড়া বা DCP বাড়ান</li>`;
+  if(caPRatio<1||caPRatio>7) warnings+=`<li>Ca:P অনুপাত (${caPRatio.toFixed(2)}:১) অস্বাভাবিক — স্বাভাবিক: ১:১ থেকে ৭:১</li>`;
+  if(dmiPct>120)      warnings+=`<li>DMI বেশি (${dmiPct}%) — রেশনের মোট পরিমাণ কমান</li>`;
+  if(dmiPct<80)       warnings+=`<li>DMI কম (${dmiPct}%) — রেশনের পরিমাণ বাড়ান</li>`;
+  if(R.ADG>0 && adgPct<85) warnings+=`<li>প্রত্যাশিত ADG (${ADG_pred.toFixed(2)} কেজি) লক্ষ্যমাত্রার (${R.ADG} কেজি) চেয়ে কম — NEg ঘনত্ব বাড়ান</li>`;
+  if(!warnings) warnings='<li style="color:var(--g2)">✅ সব পুষ্টি সঠিক পরিসরে রয়েছে!</li>';
+
+  const roughPct = n.dmi>0 ? Math.round(RATION.filter(r=>{const f=feedDB.find(x=>x.id===r.feedId);return f&&(f.c==='roughage'||f.c==='local')}).reduce((s,r)=>s+r.kg_dm,0)/n.dmi*100) : 0;
+  const concPct  = 100 - roughPct;
 
   document.getElementById('ration-nutri-body').innerHTML=`
     <table class="report-table" style="margin-bottom:14px">
-      <thead><tr><th>পুষ্টি উপাদান</th><th>চাহিদা</th><th>সরবরাহ</th><th>পূরণ %</th><th>অবস্থা</th></tr></thead>
+      <thead><tr>
+        <th>পুষ্টি উপাদান</th>
+        <th>চাহিদা</th>
+        <th>সরবরাহ</th>
+        <th>পূরণ %</th>
+        <th>অবস্থা</th>
+      </tr></thead>
       <tbody>
-        <tr><td>⚡ NEm (Mcal/day)</td><td>${R.NEmFinal.toFixed(3)}</td><td>${n.nem.toFixed(3)}</td><td>${nemPct}%</td><td>${st(nemPct)}</td></tr>
-        <tr><td>🚀 NEg (Mcal/day)</td><td>${R.NEg.toFixed(3)}</td><td>${n.neg.toFixed(3)}</td><td>${negPct}%</td><td>${st(negPct)}</td></tr>
-        <tr><td>🥩 MP (g/day)</td><td>${R.MP_total.toFixed(0)}</td><td>${n.mp.toFixed(0)}</td><td>${mpPct}%</td><td>${st(mpPct)}</td></tr>
-        <tr><td>🌾 DMI (kg/day)</td><td>${R.DMI.toFixed(2)}</td><td>${n.dmi.toFixed(2)}</td><td>${pct(n.dmi,R.DMI)}%</td><td>${st(pct(n.dmi,R.DMI))}</td></tr>
-        <tr><td>🦴 Ca (g/day)</td><td>${R.Ca_req.toFixed(2)}</td><td>${n.ca.toFixed(2)}</td><td>${caPct}%</td><td>${st(caPct)}</td></tr>
-        <tr><td>🔬 P (g/day)</td><td>${R.P_req.toFixed(2)}</td><td>${n.p.toFixed(2)}</td><td>${pPct}%</td><td>${st(pPct)}</td></tr>
-        <tr><td>Ca:P অনুপাত</td><td colspan="2">${caPRatio.toFixed(2)} : ১ (সরবরাহে)</td><td colspan="2">${caPRatio>=1&&caPRatio<=7?'<span class="status-ok">✅ গ্রহণযোগ্য</span>':'<span class="status-warn">⚠️ সমন্বয় করুন</span>'}</td></tr>
+        <tr style="background:rgba(16,185,129,0.06)">
+          <td>⚡ NEm ঘনত্ব (Mcal/kg DM)</td>
+          <td>${R.NEm_dens_req.toFixed(3)}</td>
+          <td>${n.nem_density.toFixed(3)}</td>
+          <td>${nemDPct}%</td>
+          <td>${st(nemDPct)}</td>
+        </tr>
+        <tr style="background:rgba(245,158,11,0.06)">
+          <td>🚀 NEg ঘনত্ব (Mcal/kg DM)</td>
+          <td>${R.NEg_dens_req.toFixed(3)}</td>
+          <td>${n.neg_density.toFixed(3)}</td>
+          <td>${negDPct}%</td>
+          <td>${st(negDPct)}</td>
+        </tr>
+        <tr>
+          <td colspan="5" style="padding:4px 8px;background:var(--g6);font-size:12px;color:var(--gray)">
+            📌 <em>NRC 2000: NEm ও NEg তুলনা diet density (Mcal/kg DM)-এ করা হয়। 
+            Total supply vs maintenance-only তুলনা সর্বদা >200% দেখায় — এটি NRC পদ্ধতি নয়।</em>
+          </td>
+        </tr>
+        <tr style="background:rgba(59,130,246,0.06)">
+          <td>🥩 CP (g/day)</td>
+          <td>${R.CP_approx.toFixed(0)}</td>
+          <td>${n.cp.toFixed(0)}</td>
+          <td>${cpPct}%</td>
+          <td>${st(cpPct)}</td>
+        </tr>
+        <tr style="padding-left:18px">
+          <td style="padding-left:20px;color:var(--gray);font-size:12px">↳ MP আনুমানিক (CP×0.64, g/day)</td>
+          <td style="color:var(--gray);font-size:12px">${R.MP_total.toFixed(0)}</td>
+          <td style="color:var(--gray);font-size:12px">${n.mp.toFixed(0)}</td>
+          <td colspan="2" style="color:var(--gray);font-size:12px">তথ্যমূলক</td>
+        </tr>
+        <tr>
+          <td>🌾 DMI (kg/day)</td>
+          <td>${R.DMI.toFixed(2)}</td>
+          <td>${n.dmi.toFixed(2)}</td>
+          <td>${dmiPct}%</td>
+          <td>${st(dmiPct)}</td>
+        </tr>
+        <tr>
+          <td>🦴 Ca (g/day)</td>
+          <td>${R.Ca_req.toFixed(2)}</td>
+          <td>${n.ca.toFixed(2)}</td>
+          <td>${caPct}%</td>
+          <td>${st(caPct)}</td>
+        </tr>
+        <tr>
+          <td>🔬 P (g/day)</td>
+          <td>${R.P_req.toFixed(2)}</td>
+          <td>${n.p.toFixed(2)}</td>
+          <td>${pPct}%</td>
+          <td>${st(pPct)}</td>
+        </tr>
+        <tr>
+          <td>Ca:P অনুপাত</td>
+          <td>১:১ – ৭:১</td>
+          <td>${caPRatio.toFixed(2)} : ১</td>
+          <td colspan="2">${caPRatio>=1&&caPRatio<=7?'<span class="status-ok">✅ গ্রহণযোগ্য</span>':'<span class="status-warn">⚠️ সমন্বয় করুন</span>'}</td>
+        </tr>
+        ${R.ADG>0?`<tr style="background:rgba(139,92,246,0.08);font-weight:600">
+          <td>📈 প্রত্যাশিত ADG (kg/day)</td>
+          <td>${R.ADG.toFixed(2)} কেজি</td>
+          <td>${ADG_pred.toFixed(2)} কেজি</td>
+          <td>${adgPct}%</td>
+          <td>${st(adgPct)}</td>
+        </tr>`:''}
       </tbody>
     </table>
-    ${warnings?`<div class="${warnings.includes('✅')&&!warnings.includes('li style')&&!warnings.includes('❌')&&!warnings.includes('⚠️')?'ok-box':'alert-box'}">
-      <strong>🔍 পর্যবেক্ষণ ও পরামর্শ:</strong><ul style="margin-top:6px;padding-left:18px;line-height:1.9">${warnings}</ul>
-    </div>`:''}
+    <div class="${warnings.includes('✅')&&!warnings.includes('❌')&&!warnings.includes('⚠️')?'ok-box':'alert-box'}">
+      <strong>🔍 পর্যবেক্ষণ ও পরামর্শ:</strong>
+      <ul style="margin-top:6px;padding-left:18px;line-height:1.9">${warnings}</ul>
+    </div>
     <div class="info-box" style="margin-top:8px;font-size:12px">
-      <strong>রেশনের উপাদান অনুপাত:</strong> আঁশজাতীয়: ${Math.round(RATION.filter(r=>{const f=feedDB.find(x=>x.id===r.feedId);return f&&(f.c==='roughage'||f.c==='local')}).reduce((s,r)=>s+r.kg_dm,0)/n.dmi*100)}% | 
-      দানাদার ও প্রোটিন: ${Math.round(RATION.filter(r=>{const f=feedDB.find(x=>x.id===r.feedId);return f&&(f.c==='grain'||f.c==='protein'||f.c==='byproduct')}).reduce((s,r)=>s+r.kg_dm,0)/n.dmi*100)}%
+      <strong>রেশন অনুপাত (DM ভিত্তিক):</strong>
+      আঁশজাতীয় ${roughPct}% | দানাদার+প্রোটিন ${concPct}% |
+      CP: ${n.cp_pct.toFixed(1)}% DM | NEm: ${n.nem_density.toFixed(2)} Mcal/kg | NEg: ${n.neg_density.toFixed(2)} Mcal/kg
     </div>`;
 }
 
@@ -1375,39 +1666,215 @@ function autoSuggestRation(){
   if(!REQ){alert('আগে পশু তথ্য দিয়ে চাহিদা হিসাব করুন!');return;}
   RATION=[];
   const R=REQ;
-  const BW=R.BW, ADG=R.ADG, diet=R.diet;
+  const DMI_target     = R.DMI;            // kg DM/day
+  const NEm_dens_req   = R.NEm_dens_req;  // Mcal/kg DM — required NEm density
+  const NEg_dens_req   = R.NEg_dens_req;  // Mcal/kg DM — required NEg density
+  const CP_target      = R.CP_approx;     // g/day
+  const diet = R.diet;
 
-  // Simple rule-based auto ration for Bangladesh context
-  if(diet==='forage'){
-    addFeedAmt(20, BW*0.030);  // Napier grass
-    addFeedAmt(23, BW*0.008);  // Rice straw
-    addFeedAmt(66, BW*0.003);  // Wheat bran
-    addFeedAmt(47, BW*0.002);  // Mustard cake
-    addFeedAmt(80, BW*0.001);  // Molasses
-    addFeedAmt(85, 0.03);      // Salt
-  } else if(diet==='conc'){
-    addFeedAmt(31, BW*0.010);  // Corn grain
-    addFeedAmt(66, BW*0.006);  // Wheat bran
-    addFeedAmt(47, BW*0.004);  // Mustard cake
-    addFeedAmt(49, BW*0.002);  // Soybean meal
-    addFeedAmt(20, BW*0.008);  // Napier
-    addFeedAmt(80, BW*0.001);  // Molasses
-    addFeedAmt(83, 0.05);      // Mineral premix
-    addFeedAmt(85, 0.03);      // Salt
+  // ════════════════════════════════════════════════════
+  // STEP 1: Feed slot সংজ্ঞায়ন — diet type অনুযায়ী
+  // প্রতিটি slot: { id, role, minFrac, maxFrac }
+  // frac = fraction of mainDMI (variable DM-এর মধ্যে অংশ)
+  // ════════════════════════════════════════════════════
+
+  // Fixed supplements (kg DM — পরিবর্তন হয় না)
+  const saltDM    = 0.030;
+  const mineralDM = (diet !== 'forage') ? 0.050 : 0;
+  const molassDM  = Math.min(DMI_target * 0.05, 0.25);
+  const fixedDM   = saltDM + mineralDM + molassDM;
+  const mainDMI   = Math.max(1.0, DMI_target - fixedDM);
+
+  // Feed slots by diet type
+  // role: 'roughage' | 'grain' | 'protein' | 'byproduct'
+  // NRC 2021 feed IDs:
+  // 14=Bermudagrass Hay, 32=Cool-Season Grass Hay Mid, 95=Legume Hay Mid
+  // 175=Wheat Straw, 122=Rice Silage Headed
+  // 45=Corn Grain Dry Med, 168=Wheat Bran, 119=Rice Bran
+  // 26=Canola Meal, 146=SBM 48%, 58=Cottonseed Meal
+  // 101=Molasses, 23=Calcium Soaps
+  let slots;
+  if(diet === 'forage'){
+    slots = [
+      {id:14,  role:'roughage', frac:0.50, min:0.35, max:0.75}, // Bermudagrass Hay (ঘাস হে)
+      {id:32,  role:'roughage', frac:0.20, min:0.05, max:0.30}, // Cool-Season Grass Hay
+      {id:175, role:'roughage', frac:0.15, min:0.05, max:0.25}, // Wheat Straw (গমের খড়)
+      {id:26,  role:'protein',  frac:0.10, min:0.03, max:0.18}, // Canola Meal (সরিষার প্রক্সি)
+      {id:168, role:'grain',    frac:0.05, min:0.02, max:0.12}, // Wheat Bran
+    ];
+  } else if(diet === 'conc'){
+    slots = [
+      {id:45,  role:'grain',    frac:0.35, min:0.20, max:0.50}, // Corn Grain, Dry
+      {id:168, role:'grain',    frac:0.18, min:0.10, max:0.28}, // Wheat Bran
+      {id:14,  role:'roughage', frac:0.12, min:0.08, max:0.20}, // Bermudagrass Hay
+      {id:26,  role:'protein',  frac:0.12, min:0.06, max:0.20}, // Canola Meal
+      {id:146, role:'protein',  frac:0.10, min:0.04, max:0.18}, // Soybean Meal 48%
+      {id:119, role:'byproduct',frac:0.08, min:0.03, max:0.14}, // Rice Bran
+      {id:175, role:'roughage', frac:0.05, min:0.02, max:0.10}, // Wheat Straw
+    ];
   } else { // mixed
-    addFeedAmt(20, BW*0.020);  // Napier grass
-    addFeedAmt(23, BW*0.005);  // Rice straw
-    addFeedAmt(31, BW*0.006);  // Corn grain
-    addFeedAmt(66, BW*0.005);  // Wheat bran
-    addFeedAmt(47, BW*0.003);  // Mustard cake
-    addFeedAmt(49, BW*0.002);  // Soybean meal
-    addFeedAmt(64, BW*0.003);  // Rice bran
-    addFeedAmt(80, BW*0.001);  // Molasses
-    addFeedAmt(83, 0.05);      // Mineral premix
-    addFeedAmt(85, 0.03);      // Salt
+    slots = [
+      {id:14,  role:'roughage', frac:0.28, min:0.15, max:0.40}, // Bermudagrass Hay
+      {id:175, role:'roughage', frac:0.10, min:0.04, max:0.18}, // Wheat Straw
+      {id:45,  role:'grain',    frac:0.20, min:0.10, max:0.32}, // Corn Grain, Dry
+      {id:168, role:'grain',    frac:0.14, min:0.08, max:0.22}, // Wheat Bran
+      {id:26,  role:'protein',  frac:0.13, min:0.06, max:0.20}, // Canola Meal
+      {id:146, role:'protein',  frac:0.08, min:0.03, max:0.14}, // Soybean Meal 48%
+      {id:119, role:'byproduct',frac:0.07, min:0.03, max:0.12}, // Rice Bran
+    ];
   }
+
+  // ════════════════════════════════════════════════════
+  // STEP 2: helpers
+  // ════════════════════════════════════════════════════
+  function getFeed(id){ return feedDB.find(x=>x.id===id && !x.deleted); }
+
+  // slot filter: deleted feed বাদ
+  const activeSlots = slots.filter(s => getFeed(s.id));
+
+  // সাপ্লিমেন্টের fixed nutrient contribution
+  let FC_nem=0, FC_neg=0, FC_cp=0;
+  [[80,molassDM],[83,mineralDM],[85,saltDM]].forEach(([id,kgDM])=>{
+    const f=getFeed(id); if(!f||kgDM<=0) return;
+    FC_nem += f.nem * kgDM;
+    FC_neg += f.neg * kgDM;
+    FC_cp  += f.cp  * kgDM * 10;
+  });
+
+  // ════════════════════════════════════════════════════
+  // STEP 3: Iterative optimizer
+  // 'fracs' = প্রতিটি active slot-এর mainDMI-তে ভাগ (sum=1)
+  // kg_i = fracs[i] * mainDMI  →  মোট variable DM = mainDMI
+  // মোট DMI = fixedDM + mainDMI = DMI_target  ✓ (সর্বদা সঠিক)
+  //
+  // পদ্ধতি: grain↔roughage shift → NEm/NEg নিয়ন্ত্রণ
+  //         protein↔grain shift  → CP নিয়ন্ত্রণ
+  //         প্রতি iteration: clamp → normalize (sum=1 বজায়)
+  // ════════════════════════════════════════════════════
+
+  // fracs থেকে nutrient হিসাব (fracs sum=1 ধরে)
+  function evalFracs(fracs){
+    let nem=FC_nem, neg=FC_neg, cp=FC_cp;
+    activeSlots.forEach((s,i)=>{
+      const f=getFeed(s.id); if(!f) return;
+      const kg = fracs[i] * mainDMI;  // kg DM
+      nem += f.nem * kg;
+      neg += f.neg * kg;
+      cp  += f.cp  * kg * 10;         // g CP (f.cp হলো % DM)
+    });
+    const dmi = fixedDM + mainDMI;    // = DMI_target, সর্বদা fixed
+    // Density = total nutrient / total DM (NRC 2000 comparison basis)
+    const nem_density = dmi > 0 ? nem / dmi : 0;
+    const neg_density = dmi > 0 ? neg / dmi : 0;
+    return {nem, neg, cp, dmi, nem_density, neg_density};
+  }
+
+  // clamp [min,max] তারপর normalize যাতে sum=1
+  function clampNorm(fracs){
+    const c = fracs.map((v,i)=> Math.min(Math.max(v, activeSlots[i].min), activeSlots[i].max));
+    const s = c.reduce((a,b)=>a+b, 0);
+    return s>0 ? c.map(v=>v/s) : c.map(()=>1/c.length);
+  }
+
+  // initial fracs → normalize করা
+  let fracs = clampNorm(activeSlots.map(s => s.frac));
+
+  const grainIdx   = activeSlots.map((s,i)=>s.role==='grain'    ?i:-1).filter(i=>i>=0);
+  const proteinIdx = activeSlots.map((s,i)=>s.role==='protein'  ?i:-1).filter(i=>i>=0);
+  const roughIdx   = activeSlots.map((s,i)=>s.role==='roughage' ?i:-1).filter(i=>i>=0);
+  const byproIdx   = activeSlots.map((s,i)=>s.role==='byproduct'?i:-1).filter(i=>i>=0);
+  // energy counter: grain + byproduct
+  const enerCounterIdx = [...grainIdx, ...byproIdx].length ? [...grainIdx, ...byproIdx] : roughIdx;
+
+  const TOL      = 0.05;   // ±৫%
+  const MAX_ITER = 200;
+  const STEP     = 0.012;
+
+  for(let iter=0; iter<MAX_ITER; iter++){
+    const n = evalFracs(fracs);
+    // Density-based error: (diet_density - required_density) / required_density
+    const nemErr = NEm_dens_req>0 ? (n.nem_density - NEm_dens_req) / NEm_dens_req : 0;
+    const negErr = NEg_dens_req>0 ? (n.neg_density - NEg_dens_req) / NEg_dens_req : 0;
+    const cpErr  = CP_target>0    ? (n.cp - CP_target) / CP_target                : 0;
+
+    const nemOk = Math.abs(nemErr) <= TOL;
+    const negOk = Math.abs(negErr) <= TOL;
+    const cpOk  = Math.abs(cpErr)  <= TOL;
+    if(nemOk && negOk && cpOk) break;
+
+    // ── Energy (NEm+NEg density) নিয়ন্ত্রণ: grain↔roughage
+    const energyErr = (nemErr + negErr) / 2;
+    if(Math.abs(energyErr) > TOL*0.4 && grainIdx.length && roughIdx.length){
+      const step = STEP / Math.max(1, iter/40);  // iteration বাড়লে step ছোট হয়
+      if(energyErr > 0){
+        grainIdx.forEach(i=>{ fracs[i] = Math.max(activeSlots[i].min, fracs[i] - step/grainIdx.length); });
+        roughIdx.forEach(i=>{ fracs[i] = Math.min(activeSlots[i].max, fracs[i] + step/roughIdx.length); });
+      } else {
+        grainIdx.forEach(i=>{ fracs[i] = Math.min(activeSlots[i].max, fracs[i] + step/grainIdx.length); });
+        roughIdx.forEach(i=>{ fracs[i] = Math.max(activeSlots[i].min, fracs[i] - step/roughIdx.length); });
+      }
+      fracs = clampNorm(fracs);
+    }
+
+    // ── CP নিয়ন্ত্রণ: protein↔enerCounter
+    if(Math.abs(cpErr) > TOL*0.4 && proteinIdx.length){
+      const step = STEP / Math.max(1, iter/40);
+      if(cpErr > 0){
+        proteinIdx.forEach(i=>{ fracs[i] = Math.max(activeSlots[i].min, fracs[i] - step/proteinIdx.length); });
+        enerCounterIdx.forEach(i=>{ fracs[i] = Math.min(activeSlots[i].max, fracs[i] + step/enerCounterIdx.length); });
+      } else {
+        proteinIdx.forEach(i=>{ fracs[i] = Math.min(activeSlots[i].max, fracs[i] + step/proteinIdx.length); });
+        enerCounterIdx.forEach(i=>{ fracs[i] = Math.max(activeSlots[i].min, fracs[i] - step/enerCounterIdx.length); });
+      }
+      fracs = clampNorm(fracs);
+    }
+  }
+
+  // ════════════════════════════════════════════════════
+  // STEP 4: RATION array তৈরি
+  // kg_i = fracs[i] * mainDMI  (fracs sum=1, mainDMI fixed)
+  // মোট variable DM = mainDMI, মোট DM = DMI_target ✓
+  // ════════════════════════════════════════════════════
+  activeSlots.forEach((s,i)=>{
+    const kg = fracs[i] * mainDMI;
+    if(kg >= 0.025) addFeedAmt(s.id, kg);
+  });
+  addFeedAmt(101, molassDM);           // Molasses
+  if(mineralDM > 0) addFeedAmt(23, mineralDM); // Calcium Soaps (mineral proxy)
+
   renderRation();
   renderFeedPicker();
+
+  const fin = evalFracs(fracs);
+  function pctStr(got, req){ return req>0 ? Math.round(got/req*100)+'%' : 'N/A'; }
+  function okStr(got, req){
+    const p = req>0 ? got/req : 1;
+    return p>=0.95&&p<=1.05 ? '✅' : p>=0.90&&p<=1.10 ? '⚠️' : '❌';
+  }
+
+  // Predicted ADG from optimized ration
+  let ADG_pred = 0;
+  if(fin.neg > 0 && R.EBW > 0){
+    const coeff = 0.0635 * Math.pow(R.EBW, 0.75);
+    const EBG_pred = Math.pow(fin.neg / coeff, 1/1.097);
+    ADG_pred = EBG_pred / 0.956;
+  }
+
+  const msg =
+    `✅ NRC 2000 ভিত্তিক রেশন অপ্টিমাইজ হয়েছে!\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `পুষ্টি        চাহিদা  → সরবরাহ   পূরণ\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `DMI           ${DMI_target.toFixed(2)} → ${fin.dmi.toFixed(2)} কেজি  ${okStr(fin.dmi,DMI_target)} ${pctStr(fin.dmi,DMI_target)}\n` +
+    `NEm density   ${NEm_dens_req.toFixed(3)} → ${fin.nem_density.toFixed(3)} Mcal/kg ${okStr(fin.nem_density,NEm_dens_req)} ${pctStr(fin.nem_density,NEm_dens_req)}\n` +
+    `NEg density   ${NEg_dens_req.toFixed(3)} → ${fin.neg_density.toFixed(3)} Mcal/kg ${okStr(fin.neg_density,NEg_dens_req)} ${pctStr(fin.neg_density,NEg_dens_req)}\n` +
+    `CP            ${CP_target.toFixed(0)}g → ${fin.cp.toFixed(0)}g  ${okStr(fin.cp,CP_target)} ${pctStr(fin.cp,CP_target)}\n` +
+    `প্রত্যাশিত ADG ${R.ADG.toFixed(2)} → ${ADG_pred.toFixed(2)} কেজি/দিন ${okStr(ADG_pred,R.ADG)} ${pctStr(ADG_pred,R.ADG)}\n` +
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+    `✅=±৫%  ⚠️=±১০%  ❌=বেশি পার্থক্য\n` +
+    `প্রয়োজনে রেশনের পরিমাণ সামান্য সমন্বয় করুন।`;
+
+  setTimeout(()=>alert(msg), 100);
 }
 
 function addFeedAmt(id, kg){
@@ -1478,8 +1945,8 @@ function buildReport(){
       <table class="report-table" style="margin-top:12px">
         <thead><tr><th>পুষ্টি</th><th>চাহিদা</th><th>সরবরাহ</th><th>পূরণ %</th><th>মূল্যায়ন</th></tr></thead>
         <tbody>
-          <tr><td>NEm (Mcal/day)</td><td>${R.NEmFinal.toFixed(3)}</td><td>${n.nem.toFixed(3)}</td><td>${pct(n.nem,R.NEmFinal)}%</td><td>${st(pct(n.nem,R.NEmFinal))}</td></tr>
-          <tr><td>NEg (Mcal/day)</td><td>${R.NEg.toFixed(3)}</td><td>${n.neg.toFixed(3)}</td><td>${pct(n.neg,R.NEg)}%</td><td>${st(pct(n.neg,R.NEg))}</td></tr>
+          <tr><td>NEm ঘনত্ব (Mcal/kg DM)</td><td>${R.NEm_dens_req.toFixed(3)}</td><td>${n.nem_density.toFixed(3)}</td><td>${pct(n.nem_density,R.NEm_dens_req)}%</td><td>${st(pct(n.nem_density,R.NEm_dens_req))}</td></tr>
+          <tr><td>NEg ঘনত্ব (Mcal/kg DM)</td><td>${R.NEg_dens_req.toFixed(3)}</td><td>${n.neg_density.toFixed(3)}</td><td>${pct(n.neg_density,R.NEg_dens_req)}%</td><td>${st(pct(n.neg_density,R.NEg_dens_req))}</td></tr>
           <tr><td>MP (g/day)</td><td>${R.MP_total.toFixed(0)}</td><td>${n.mp.toFixed(0)}</td><td>${pct(n.mp,R.MP_total)}%</td><td>${st(pct(n.mp,R.MP_total))}</td></tr>
           <tr><td>Ca (g/day)</td><td>${R.Ca_req.toFixed(2)}</td><td>${n.ca.toFixed(2)}</td><td>${pct(n.ca,R.Ca_req)}%</td><td>${st(pct(n.ca,R.Ca_req))}</td></tr>
           <tr><td>P (g/day)</td><td>${R.P_req.toFixed(2)}</td><td>${n.p.toFixed(2)}</td><td>${pct(n.p,R.P_req)}%</td><td>${st(pct(n.p,R.P_req))}</td></tr>
